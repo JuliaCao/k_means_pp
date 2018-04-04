@@ -1,4 +1,4 @@
-# Reimplementation and evaluation k_means++ parallelization
+# Reimplementation and evaluation of k_means++ parallelization
 
 CS 267 Spring 2018 Final project 
 Team Latenight
