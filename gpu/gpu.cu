@@ -51,7 +51,7 @@ int weighted_rand_index(VectorXd& W, Rand& r){
 }
 
 template<typename Rand>
-void kpp_gpu(MatrixXd& X, MatrixXd& C, Rand& r) {
+void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 
 	VectorXd D(N);
 	for(int i  = 0 ; i < N ; i++){
@@ -78,8 +78,6 @@ void kpp_gpu(MatrixXd& X, MatrixXd& C, Rand& r) {
 
 int main( int argc, char** argv ){
 
-	std::string sep = "\n----------------------------------------\n";
-	IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
 	int n = read_int( argc, argv, "-n", 1000 );
 	int m = read_int( argc, argv, "-m", 2);
@@ -93,14 +91,14 @@ int main( int argc, char** argv ){
 	// std::mt19937 e2(rd());
 	uniform_real_distribution<double> dist(-1.f, 1.f);
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
-	auto mat_rand = bind(dist, ref(rd));
-	auto weight_rand = bind(zero_one, ref(rd));
+	auto mat_rand = bind(dist,ref(rd));
+	auto weight_rand = bind(zero_one,ref(rd));
 
-	MatrixXd X = MatrixXd::Random(n, m);
-	MatrixXd C(k, m);
+	MatrixXd X = MatrixXd::Random(N,M);
+	MatrixXd C(K,M);
 
 
-	// generate_data(X, mat_rand);
-  kpp_gpu(X, C, weight_rand);
+	// generate_data(X,mat_rand);
+  kpp_serial(X, C, weight_rand);
 	// output_kmeans_pp()
 }
