@@ -92,6 +92,7 @@ int main( int argc, char** argv ){
 	auto weight_rand = bind(zero_one, ref(rd));
 
 	MatrixXd X = MatrixXd::Random(n, m);
+	cout << X << sep;
 	MatrixXd C(k, m);
 
 	// auto mat_rand = bind(kmdata, ref(rd));
