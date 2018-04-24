@@ -165,23 +165,19 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
 
 int main( int argc, char** argv ){
-	std::string sep = "\n----------------------------------------\n";
-	IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
 	random_device rd;
 	// std::mt19937 e2(rd());
 	uniform_real_distribution<double> dist(-1.f, 1.f);
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
-	auto weight_rand = bind(zero_one, ref(rd));
+	auto mat_rand = bind(dist,ref(rd));
+	auto weight_rand = bind(zero_one,ref(rd));
 
-	MatrixXd X = MatrixXd::Random(n, m);
-
-	cout << X.format(CleanFmt) << sep;
+	MatrixXd X = MatrixXd::Random(N,M);
 	MatrixXd C(K,M);
 
 
 	// generate_data(X,mat_rand);
-	// auto mat_rand = bind(dist,ref(rd));
   kpp_serial(X, C, weight_rand);
 	// output_kmeans_pp()
 }
