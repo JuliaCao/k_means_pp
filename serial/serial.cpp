@@ -166,6 +166,8 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
 int main( int argc, char** argv ){
 	std::string sep = "\n----------------------------------------\n";
+	IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+
 	random_device rd;
 	// std::mt19937 e2(rd());
 	uniform_real_distribution<double> dist(-1.f, 1.f);
@@ -174,7 +176,7 @@ int main( int argc, char** argv ){
 
 	MatrixXd X = MatrixXd::Random(n, m);
 
-	cout << X << sep;
+	cout << X.format(CleanFmt) << sep;
 	MatrixXd C(K,M);
 
 
