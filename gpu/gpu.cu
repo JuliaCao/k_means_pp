@@ -81,7 +81,7 @@ int main( int argc, char** argv ){
 
 	int n = read_int( argc, argv, "-n", 1000 );
 	int m = read_int( argc, argv, "-m", 2);
-	int k = read_int( argc, argv, "-k", );
+	int k = read_int( argc, argv, "-k", 10);
 
 	cout << n;
 	cout << m;
