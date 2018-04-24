@@ -3,6 +3,7 @@
 #include <limits>
 #include <functional>
 #include <cstdint>
+#include <iostream>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
