@@ -83,9 +83,9 @@ int main( int argc, char** argv ){
 	int m = read_int( argc, argv, "-m", 2);
 	int k = read_int( argc, argv, "-k", );
 
-	cout << n
-	cout << m
-	cout << k
+	cout << n;
+	cout << m;
+	cout << k;
 
 	random_device rd;
 	// std::mt19937 e2(rd());
