@@ -1,6 +1,6 @@
 CC = nvcc
 CFLAGS = -O3 -arch=compute_37 -code=sm_37
-NVCCFLAGS = -O3 -arch=compute_37 -code=sm_37
+NVCCFLAGS = -O3 -arch=compute_37 -code=sm_37 -std=c++11
 
 all: gpu
 
