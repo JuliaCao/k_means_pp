@@ -1,14 +1,11 @@
-CC = nvcc
-CFLAGS = -O3 -arch=compute_37 -code=sm_37
-NVCCFLAGS = -O3 -arch=compute_37 -code=sm_37
+CC = g++ -std=c++11
+LDLIBS = -openmp
+target = serial
 
-all: gpu
+all: serial
 
-gpu: gpu.o common.o
-        $(CC) -o $@ $(NVCCLIBS) gpu.o
-
-gpu.o: gpu.cu common.h
-        $(CC) -c $(NVCCFLAGS) gpu.cu
+serial: serial.cpp
+	$(CC) serial.cpp -o serial $(LDLIBS)
 
 clean:
-	rm -f *.o $(target)
+	rm -f $(target)
