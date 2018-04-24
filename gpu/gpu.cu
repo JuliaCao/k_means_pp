@@ -83,7 +83,7 @@ int main( int argc, char** argv ){
 	int m = read_int( argc, argv, "-m", 2);
 	int k = read_int( argc, argv, "-k", 10);
 
-	cout << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << "CLUSTERS, AND " << m << " DIMENSIONS." << sep;
+	cout << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS." << sep;
 
 	random_device rd;
 	// std::mt19937 e2(rd());

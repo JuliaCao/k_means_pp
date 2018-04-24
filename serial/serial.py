@@ -6,8 +6,8 @@ from sklearn.cluster import KMeans
 
 # Hyper parameters
 M = 2
-K = 10
-N = 1000
+K = 4
+N = 10
 
 
 def generate_data():
@@ -83,6 +83,7 @@ if __name__ == "__main__":
     X = generate_data()
     C = kpp_serial(X, K)
 
+    print(C)
     # compare_kmeans()
     plot_kmeans_pp()
     # plot_kmeans()
