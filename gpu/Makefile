@@ -7,10 +7,10 @@ all: gpu
 
 gpu: gpu.o
 	$(CC) -o $@ $(NVCCLIBS) gpu.o
+	rm -f *.o
 
 gpu.o: gpu.cu
 	$(CC) -c $(NVCCFLAGS) gpu.cu
-	rm -f *.o
 
 clean:
 	rm -f $(target)
