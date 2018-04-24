@@ -89,10 +89,10 @@ int main( int argc, char** argv ){
 
 	random_device rd;
 	// std::mt19937 e2(rd());
-	uniform_real_distribution<double> dist(-1.f, 1.f);
+	uniform_real_distribution<double> kmdata(-1.f, 1.f);
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
-	auto mat_rand = bind(dist,ref(rd));
-	auto weight_rand = bind(zero_one,ref(rd));
+	auto mat_rand = bind(kmdata, ref(rd));
+	auto weight_rand = bind(zero_one, ref(rd));
 
 	MatrixXd X = MatrixXd::Random(N,M);
 	MatrixXd C(K,M);
