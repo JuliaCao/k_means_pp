@@ -40,10 +40,10 @@ int weighted_rand_index(VectorXd& W,Rand& r){
 		i++;
 	  s += W(i);
 	}
-		
+
 	return i;
 }
-	
+
 template<typename Rand>
 void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 
@@ -63,17 +63,17 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
         VectorXd tmp = c - x;
     		D(i) = min(tmp.norm(),D(i));
     	}
-	  
+
 	  int i = weighted_rand_index(D,r);
 	  C(j) = X(i);
 	}
-  
+
 	return;
 }
 
 template<typename Rand>
 void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
-	
+
 
     int p = omp_get_num_threads();//#threads
     vector<int> I(p,0);
@@ -98,7 +98,7 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
     		int hi = min(lo + N/p, N-1);
 
     		//calculate weights for this part
-    		
+
 
 		    S(t) = 0.0f;
 
@@ -123,10 +123,10 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
     	// }
 
       int sub_t = weighted_rand_index(S,r);
-      int i = I[sub_t];           
+      int i = I[sub_t];
       C(j) = X(i);
     }
-  
+
     return;
 
 }
@@ -165,19 +165,21 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
 
 int main( int argc, char** argv ){
-
+	std::string sep = "\n----------------------------------------\n";
 	random_device rd;
 	// std::mt19937 e2(rd());
 	uniform_real_distribution<double> dist(-1.f, 1.f);
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
-	auto mat_rand = bind(dist,ref(rd));
-	auto weight_rand = bind(zero_one,ref(rd));
+	auto weight_rand = bind(zero_one, ref(rd));
 
-	MatrixXd X = MatrixXd::Random(N,M);
+	MatrixXd X = MatrixXd::Random(n, m);
+
+	cout << X << sep;
 	MatrixXd C(K,M);
 
 
 	// generate_data(X,mat_rand);
+	// auto mat_rand = bind(dist,ref(rd));
   kpp_serial(X, C, weight_rand);
 	// output_kmeans_pp()
 }
