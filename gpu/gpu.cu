@@ -15,12 +15,31 @@
 using namespace std;
 using namespace Eigen;
 
-#define M 2
-#define K 10
-#define N 1000
+#define M 2  // num dimensions
+#define K 10  // num clusters
+#define N 1000  //num points
 
+// Command line parsing: from Homework 2.3 starter files common.cu
+int find_option( int argc, char **argv, const char *option )
+{
+    for( int i = 1; i < argc; i++ )
+        if( strcmp( argv[i], option ) == 0 )
+            return i;
+    return -1;
+}
+
+int read_int( int argc, char **argv, const char *option, int default_value )
+{
+    int iplace = find_option( argc, argv, option );
+    if( iplace >= 0 && iplace < argc-1 )
+        return atoi( argv[iplace+1] );
+    return default_value;
+}
+
+
+// k-means++
 template<typename Rand>
-int weighted_rand_index(VectorXd& W,Rand& r){
+int weighted_rand_index(VectorXd& W, Rand& r){
 	double culmulative = W.sum() * r();
 	int i = 0;
 	double s = W(0);
@@ -28,7 +47,6 @@ int weighted_rand_index(VectorXd& W,Rand& r){
 		i++;
 	  s += W(i);
 	}
-
 	return i;
 }
 
@@ -55,48 +73,19 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 	  int i = weighted_rand_index(D,r);
 	  C(j) = X(i);
 	}
-
 	return;
 }
 
-// def output_kmeans_pp():
-//     if X.shape[1] != 2 or C.shape[1] != 2:
-//         raise ValueError("M must be 2 dimensions to plot.")
-//     plt.scatter(X[:, 0], X[:, 1], color='black')
-//     plt.scatter(C[:, 0], C[:, 1], color='red')
-//     plt.show()
-
-
-// def plot_kmeans():
-//     if X.shape[1] != 2 or C.shape[1] != 2:
-//         raise ValueError("M must be 2 dimensions to plot.")
-//     km = KMeans(n_clusters=K, init=C, n_init=1)
-//     labels = km.fit_predict(X)
-//     rancols = [np.random.rand(3).tolist() for _ in range(max(labels) + 1)]
-//     colmap = dict(zip(range(max(labels) + 1), rancols))
-//     colors = [colmap[l] for l in labels]
-//     for i in range(X.shape[0]):
-//         plt.scatter(X[i][0], X[i][1], c=colors[i], s=3)
-//     plt.show()
-
-// def compare_kmeans(nruns=1000):
-//     initnames = ["ours", "sklearn", "random"]
-//     for i, init in enumerate([C, 'k-means++', 'random']):
-//         iters = []
-//         for run in range(nruns):
-//             # print("Run {} in {}".format(run, init))
-//             km = KMeans(n_clusters=K, init=init, n_init=1)
-//             km.fit_predict(X)
-//             iters.append(km.n_iter_)
-//         print("Average {} n_iters needed: {}".format(initnames[i], np.mean(iters)))
-
-
-
 int main( int argc, char** argv ){
 
-	for (int i = 1; i < argc; ++i) {
-		cout << argv[i];
-	}
+
+	int n = read_int( argc, argv, "-n", 1000 );
+	int m = read_int( argc, argv, "-m", 2);
+	int k = read_int( argc, argv, "-k", );
+
+	cout << n
+	cout << m
+	cout << k
 
 	random_device rd;
 	// std::mt19937 e2(rd());

@@ -3,3 +3,7 @@ gpu code goes in this dir
 
 Getting into bridges:
 ssh denhaus@bridges.psc.xsede.org -p 2222
+
+
+ideas for report/poster future work:
+combining gpu and mpi for multi-gpu runs
