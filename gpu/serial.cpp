@@ -94,7 +94,7 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 int main( int argc, char** argv ){
 
 	for (int i = 1; i < argc; ++i) {
-		cout << argc[i];
+		cout << argv[i];
 	}
 
 	random_device rd;
