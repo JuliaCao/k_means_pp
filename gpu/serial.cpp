@@ -4,7 +4,6 @@
 #include <functional>
 #include <cstdint>
 #include <iostream>
-#include <thrust/device_vector.h>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
