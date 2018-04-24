@@ -1,5 +1,5 @@
 CC = g++ -std=c++11
-LDLIBS = -openmp
+LDLIBS =
 target = serial
 
 all: serial
