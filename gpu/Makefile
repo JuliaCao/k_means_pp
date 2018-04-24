@@ -11,4 +11,4 @@ gpu.o: gpu.cu common.h
         $(CC) -c $(NVCCFLAGS) gpu.cu
 
 clean:
-	rm -f *.o $(target)
+				rm -f *.o $(target)
