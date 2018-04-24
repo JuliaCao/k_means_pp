@@ -63,7 +63,7 @@ void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 	C(0) = X(index);
 
 	for(int j = 1; j < k; j++){
-   	  for(auto i = 0;i<N;i++){
+   	  for(auto i = 0;  i < n; i++){
       	VectorXd c = C.row(j-1);
         VectorXd x = X.row(i);
         VectorXd tmp = c - x;
