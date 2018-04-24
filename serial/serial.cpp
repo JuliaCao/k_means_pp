@@ -73,8 +73,6 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 template<typename Rand>
 void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
-
-    int p = omp_get_num_threads();//#threads
     vector<int> I(p,0);
     VectorXd S(p);
 
