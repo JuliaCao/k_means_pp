@@ -194,7 +194,7 @@ int main( int argc, char** argv ){
 		X_serial.row(i) = randarr;
 	}
 
-	Running GPU simulation
+	// Running GPU simulation
 	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	double t0 = read_timer( );
   kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
@@ -203,11 +203,11 @@ int main( int argc, char** argv ){
 
 
 	// Initializing Data
-	// cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	// // Running serial simulation
-	// double t2 = read_timer( );
-  // kpp_serial(n, k, X_serial, C_serial, weight_rand_serial);
-	// double t3 = read_timer( ) - t2;
-	// cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
-	// cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
+	cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+	// Running serial simulation
+	double t2 = read_timer( );
+  kpp_serial(n, k, X_serial, C_serial, weight_rand_serial);
+	double t3 = read_timer( ) - t2;
+	cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
+	cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
 }
