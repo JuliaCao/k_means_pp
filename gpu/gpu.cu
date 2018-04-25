@@ -150,16 +150,12 @@ int main( int argc, char** argv ){
 
 
 	// Initializing Data
-	cout << sep << "RUNNING KMEANS++ SERIAL WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	random_device rd;
-	// std::mt19937 e2(rd());
-	uniform_real_distribution<double> zero_one(0.f, 1.f);
+	cout << sep << "RUNNING KMEANS++ SERIAL WITH SAME" << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	auto weight_rand = bind(zero_one, ref(rd));
-	MatrixXd X = MatrixXd::Random(n, m);
-	MatrixXd C(k, m);
+	C = MatrixXd::Zero(k, m)
 	// Running serial simulation
-	double t0 = read_timer( );
+	double t2 = read_timer( );
   kpp_serial(n, k, X, C, weight_rand);
-	double t1 = read_timer( ) - t0;
+	double t3 = read_timer( ) - t2;
 	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS." << sep;
 }
