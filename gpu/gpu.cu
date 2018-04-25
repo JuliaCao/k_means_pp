@@ -147,7 +147,7 @@ struct conv2tuples
 		tuple<float, int> operator()(const float& d, const int& i) const{
 			return make_tuple(d, i);
 		}
-}
+};
 
 // GPU Algorithm
 template<typename Rand>
