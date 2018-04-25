@@ -140,21 +140,21 @@ struct D_functor
 };
 
 // GPU Algorithm
-// template<typename Rand>
-// void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
-// 	thrust::device_vector<int> I, thrust::device_vector<VectorXd> &X,
-// 	thrust::device_vector<VectorXd> &C, Rand &r) {
-//
-// 	// The first seed is selected uniformly at random
-// 	int index = (int)(r() * n);
-// 	C[0] = X[index];
-// 	for(int j = 1; j < k; j++){
-// 			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
-// 			// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
-// 			// C[j] = X[i];
-// 			}
-// 	return;
-// }
+template<typename Rand>
+void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
+	thrust::device_vector<int> I, thrust::device_vector<VectorXd> &X,
+	thrust::device_vector<VectorXd> &C, Rand &r) {
+
+	// The first seed is selected uniformly at random
+	int index = (int)(r() * n);
+	C[0] = X[index];
+	for(int j = 1; j < k; j++){
+			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
+			// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
+			// C[j] = X[i];
+			}
+	return;
+}
 
 int main( int argc, char** argv ){
 
