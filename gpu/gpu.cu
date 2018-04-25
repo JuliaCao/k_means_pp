@@ -158,5 +158,5 @@ int main( int argc, char** argv ){
   kpp_serial(n, k, X, C, weight_rand);
 	double t3 = read_timer( ) - t2;
 	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS. \n";
-	cout << "THE RESULTING SPEEDUP IS: " << t2/t1 << sep;
+	cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
 }
