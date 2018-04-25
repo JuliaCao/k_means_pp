@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <thrust/device_vector.h>
+#include <thrust/device_ptr.h>
 #include <thrust/fill.h>
 #include <thrust/transform.h>
 #include <thrust/reduce.h>
@@ -78,7 +79,8 @@ void kpp_gpu(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 	float inf = numeric_limits<float>::max();
 	thrust::device_vector<float> D_gpu(n);
 	thrust::fill(D_gpu.begin(), D_gpu.end(), inf);
-	float* D_gpu_ptr = &D_gpu[0];
+	thrust::device_ptr<float> D_gpu_ptr = D_gpu.data()
+	//float* D_gpu_ptr = &D_gpu[0];
 	Map<VectorXd> D(D_gpu_ptr, n);
 
 	// The first seed is selected uniformly at random
