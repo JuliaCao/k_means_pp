@@ -1,3 +1,4 @@
+
 #include <cstdio>
 #include <random>
 #include <limits>
@@ -14,9 +15,9 @@
 using namespace std;
 using namespace Eigen;
 
-#define M 5
-#define K 2
-#define N 10
+#define M 2
+#define K 10
+#define N 1000
 
 // template<typename Rand>
 //  void generate_data(MatrixXd& data, Rand& r){
@@ -72,7 +73,7 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 }
 
 template<typename Rand>
-void kpp_serial(MatrixXd& X,MatrixXd& C, Rand& r){
+void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
 
     int p = omp_get_num_threads();//#threads
@@ -179,6 +180,5 @@ int main( int argc, char** argv ){
 
 	// generate_data(X,mat_rand);
   kpp_serial(X, C, weight_rand);
-	cout >> C >> "\n";
 	// output_kmeans_pp()
 }
