@@ -187,9 +187,8 @@ int main( int argc, char** argv ){
 	MatrixXd C_serial(k, m);
 
 			// Populating both serial and gpu arrays
-	VectorXd ranarr;
 	for (int i  = 0 ; i < n ; i++){
-		ranarr = VectorXd::Random(m);
+		VectorXd ranarr = VectorXd::Random(m);
 		X_gpu[i] = randarr;
 		X_serial.row(i) = randarr;
 	}
