@@ -155,7 +155,7 @@ void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
 	thrust::device_vector<int> I, thrust::device_vector<VectorXd> &X,
 	thrust::device_vector<VectorXd> &C, Rand &r) {
 
-	thrust::device_vector<tuple<float, int>> DI(n);
+	// thrust::device_vector<tuple<float, int>> DI(n);
 
 	// The first seed is selected uniformly at random
 	int index = (int)(r() * n);
