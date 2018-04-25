@@ -175,11 +175,11 @@ int main( int argc, char** argv ){
 	thrust::device_vector<VectorXd> C_gpu(k);
 	thrust::device_vector<VectorXd> X_gpu(n);
 	float inf = numeric_limits<float>::max();
-	thrust::device_vector<float> D(n);
-	thrust::fill(D.begin(), D.end(), inf);
+	thrust::device_vector<float> D_gpu(n);
+	thrust::fill(D_gpu.begin(), D_gpu.end(), inf);
 	// thrust::device_ptr(D)
-	thrust::device_vector<int> I(n);
-	thrust::sequence(I.begin(), I.end());
+	thrust::device_vector<int> I_gpu(n);
+	thrust::sequence(I_gpu.begin(), I_gpu.end());
 
 			// For serial
 	auto weight_rand_serial = bind(zero_one, ref(rd));
@@ -197,7 +197,7 @@ int main( int argc, char** argv ){
 	// Running GPU simulation
 	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	double t0 = read_timer( );
-  kpp_gpu(n, k, D, X_gpu, C_gpu, weight_rand_gpu);
+  kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
 	double t1 = read_timer( ) - t0;
 	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
 
