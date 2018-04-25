@@ -11,7 +11,7 @@ gpu: gpu.o
 	rm -f gpu.o
 
 serial: serial.cpp
-	$(CC) -o $@ $(CFLAGS) serial
+	$(CC) -o $(CFLAGS) serial
 
 gpu.o: gpu.cu
 	$(NVCC) -c $(NVCCFLAGS) gpu.cu
