@@ -27,10 +27,6 @@ GPU portion
 using namespace std;
 using namespace Eigen;
 
-#define M 2  // num dimensions
-#define K 10  // num clusters
-#define N 1000  //num points
-
 // Command line parsing and timing: from Homework 2.3 starter files common.cu
 int find_option( int argc, char **argv, const char *option )
 {
