@@ -5,6 +5,9 @@
 #include <cstdint>
 #include <iostream>
 #include <thrust/device_vector.h>
+#include <thrust/fill.h>
+#include <thrust/transform.h>
+#include <thrust/reduce.h>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
@@ -92,12 +95,12 @@ int main( int argc, char** argv ){
 	auto weight_rand = bind(zero_one, ref(rd));
 
 	MatrixXd X = MatrixXd::Random(n, m);
-	cout << X << sep;
+	//cout << X << sep;
 	MatrixXd C(k, m);
 
 	// auto mat_rand = bind(kmdata, ref(rd));
 	// generate_data(X,mat_rand);
   kpp_gpu(n, k, X, C, weight_rand);
-	cout << C << sep;
+	//cout << C << sep;
 	// output_kmeans_pp()
 }
