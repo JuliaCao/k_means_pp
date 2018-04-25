@@ -141,6 +141,14 @@ struct D_functor
         }
 };
 
+struct conv2tuples
+{
+	__host __device__
+		tuple<float, int> operator(const float& d, const int& i){
+			return make_tuple(d, i);
+		}
+}
+
 // GPU Algorithm
 template<typename Rand>
 void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
@@ -152,6 +160,7 @@ void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
 	C[0] = X[index];
 	for(int j = 1; j < k; j++){
 			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
+			thrust::transform(D.begin(), D.end(), I.begin(), I.end(), conv2tuples());
 			tuple<float, int> redtuple = thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), prob_reduce());
 			int ix = get<1>(redtuple);
 			C[j] = X[ix];
