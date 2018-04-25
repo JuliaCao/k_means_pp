@@ -12,6 +12,7 @@
 #include <thrust/transform.h>
 #include <thrust/reduce.h>
 #include <thrust/sequence.h>
+#include <thrust/functional.h>
 
 /*
 Author: Alexander Dunn
@@ -60,8 +61,7 @@ double read_timer( )
     return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
-
-// k-means++
+// Serial Indexing
 template<typename Rand>
 int weighted_rand_index(VectorXd& W, Rand& r){
 	double culmulative = W.sum() * r();
@@ -74,40 +74,7 @@ int weighted_rand_index(VectorXd& W, Rand& r){
 	return i;
 }
 
-template<typename Rand>
-void kpp_gpu(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
-
-	float inf = numeric_limits<float>::max();
-	thrust::device_vector<float> D_gpu(n);
-	thrust::fill(D_gpu.begin(), D_gpu.end(), inf);
-	thrust::device_vector<int> I_gpu(n);
-	thrust::sequence(I_gpu.begin(), I_gpu.end());
-	// thrust::device_ptr<float> D_gpu_ptr = D_gpu.data();
-	//float* D_gpu_ptr = &D_gpu[0];
-	// Map<VectorXd> D(D_gpu_ptr, n);
-
-	VectorXd D(n);
-	for(int i  = 0 ; i < n ; i++){
-		D(i) = numeric_limits<float>::max();
-	}
-
-	// The first seed is selected uniformly at random
-	int index = (int)(r() * n);
-	C.row(0) = X.row(index);
-	for(int j = 1; j < k; j++){
-			for(auto i = 0; i < n;i++){
-					VectorXd c = C.row(j-1);
-					VectorXd x = X.row(i);
-					VectorXd tmp = c - x;
-				D(i) = min(tmp.norm(), D(i));
-			}
-
-		int i = weighted_rand_index(D, r);
-	C.row(j) = X.row(i);
-	}
-	return;
-}
-
+// Serial Algorithm
 template<typename Rand>
 void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 
@@ -134,6 +101,66 @@ void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 }
 
 
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+// GPU Indexing
+
+tuple prob_reduce(tuple& t1, tuple& t2, Rand &r){
+}
+
+template<typename Rand>
+struct prob_reduce
+{
+    __host__ __device__
+        tuple operator()(const tuple t1, const tuple t2) const {
+					float w1 = t1[0];
+					float w2 = t2[0];
+					int i1 = t1[1];
+					int i2 = t2[1];
+					float rval = r() * (w1 + w2);
+					if (rval > w1){
+						return make_tuple(w1 + w2, i2);
+					}
+					else{
+						return make_tuple(w1 + w2, i1);
+					}
+        }
+};
+
+struct D_functor
+{
+    const VectorXd c;
+    D_functor(VectorXd _c) : c(_c) {}
+
+    __host__ __device__
+        float operator()(const VectorXd& x, const float& d) const {
+					VectorXd d2 = x - c
+            return min(d2.norm(), d);
+        }
+};
+
+// GPU Algorithm
+template<typename Rand>
+void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
+	thrust::device_vector<int> I, thrust::device_vector<VectorXd> &X,
+	thrust::device_vector<VectorXd> &C, Rand &r) {
+
+	// The first seed is selected uniformly at random
+	int index = (int)(r() * n);
+	C[0] = X[index];
+	for(int j = 1; j < k; j++){
+			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
+			}
+		// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
+		//int i = weighted_rand_index(D, r);
+		C[j] = X[i]
+	}
+	return;
+}
+
 int main( int argc, char** argv ){
 
 	// Parsing commands and prettify-ing output
@@ -143,27 +170,49 @@ int main( int argc, char** argv ){
 	int k = read_int( argc, argv, "-k", 10);
 
 	// Initializing Data
-	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+			// Common
 	random_device rd;
-	// std::mt19937 e2(rd());
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
-	auto weight_rand = bind(zero_one, ref(rd));
-	MatrixXd X = MatrixXd::Random(n, m);
-	MatrixXd C(k, m);
+
+
+			// For GPU
+	auto weight_rand_gpu = bind(zero_one, ref(rd));
+	thrust::device_vector<VectorXd> C_gpu(k);
+	thrust::device_vector<VectorXd> X_gpu(n);
+	float inf = numeric_limits<float>::max();
+	thrust::device_vector<float> D(n);
+	thrust::fill(D.begin(), D.end(), inf);
+	thrust::device_ptr(D)
+	thrust::device_vector<int> I(n);
+	thrust::sequence(I.begin(), I.end());
+
+			// For serial
+	auto weight_rand_serial = bind(zero_one, ref(rd));
+	MatrixXd X_serial(n, m);
+	MatrixXd C_serial(k, m);
+
+			// Populating both serial and gpu arrays
+	VectorXd ranarr;
+	for (int i  = 0 ; i < n ; i++){
+		ranarr = VectorXd::Random(m);
+		X_gpu[i] = randarr;
+		X_serial.row(i) = randarr;
+	}
+
 	// Running GPU simulation
+	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	double t0 = read_timer( );
-  kpp_gpu(n, k, X, C, weight_rand);
+  kpp_gpu(n, k, D, X_gpu, C_gpu, weight_rand_gpu);
 	double t1 = read_timer( ) - t0;
 	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
 
 
 	// Initializing Data
 	cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	C = MatrixXd::Zero(k, m);
 	// Running serial simulation
 	double t2 = read_timer( );
-  kpp_serial(n, k, X, C, weight_rand);
+  kpp_serial(n, k, X_serial, C_serial, weight_rand_serial);
 	double t3 = read_timer( ) - t2;
-	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS. \n";
+	cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
 	cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
 }
