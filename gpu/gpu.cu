@@ -112,7 +112,7 @@ template<typename Rand>
 struct prob_reduce
 {
     __host__ __device__
-        tuple operator()(const tuple& t1, const tuple& t2) const {
+        tuple operator()(const tuple<float, int>& t1, const tuple<float, int>& t2) const {
 					float w1 = t1[0];
 					float w2 = t2[0];
 					int i1 = t1[1];
@@ -134,8 +134,8 @@ struct D_functor
 
     __host__ __device__
         float operator()(const VectorXd& x, const float& d) const {
-					VectorXd d2 = x - c
-            return min(d2.norm(), d);
+					VectorXd d2 = x - c;
+          return min(d2.norm(), d);
         }
 };
 
