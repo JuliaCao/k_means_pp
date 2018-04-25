@@ -4,6 +4,8 @@
 #include <functional>
 #include <cstdint>
 #include <iostream>
+#include <time.h>
+#include <sys/time.h>
 #include <thrust/device_vector.h>
 #include <thrust/fill.h>
 #include <thrust/transform.h>
@@ -22,7 +24,7 @@ using namespace Eigen;
 #define K 10  // num clusters
 #define N 1000  //num points
 
-// Command line parsing: from Homework 2.3 starter files common.cu
+// Command line parsing and timing: from Homework 2.3 starter files common.cu
 int find_option( int argc, char **argv, const char *option )
 {
     for( int i = 1; i < argc; i++ )
@@ -37,6 +39,20 @@ int read_int( int argc, char **argv, const char *option, int default_value )
     if( iplace >= 0 && iplace < argc-1 )
         return atoi( argv[iplace+1] );
     return default_value;
+}
+
+double read_timer( )
+{
+    static bool initialized = false;
+    static struct timeval start;
+    struct timeval end;
+    if( !initialized )
+    {
+        gettimeofday( &start, NULL );
+        initialized = true;
+    }
+    gettimeofday( &end, NULL );
+    return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
 
@@ -86,7 +102,7 @@ int main( int argc, char** argv ){
 	int m = read_int( argc, argv, "-m", 2);
 	int k = read_int( argc, argv, "-k", 10);
 
-	cout << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS." << sep;
+	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 
 	random_device rd;
 	// std::mt19937 e2(rd());
@@ -100,7 +116,11 @@ int main( int argc, char** argv ){
 
 	// auto mat_rand = bind(kmdata, ref(rd));
 	// generate_data(X,mat_rand);
+	double t0 = read_timer( );
   kpp_gpu(n, k, X, C, weight_rand);
+	t1 = read_timer( ) - t0;
+
+	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS." << sep;
 	//cout << C << sep;
 	// output_kmeans_pp()
 }
