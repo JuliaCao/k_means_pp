@@ -127,17 +127,17 @@ void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 //         }
 // };
 
-// struct D_functor
-// {
-//     const VectorXd c;
-//     D_functor(VectorXd _c) : c(_c) {}
-//
-//     __host__ __device__
-//         float operator()(const VectorXd& x, const float& d) const {
-// 					VectorXd d2 = x - c;
-//           return min(d2.norm(), d);
-//         }
-// };
+struct D_functor
+{
+    const VectorXd c;
+    D_functor(VectorXd _c) : c(_c) {}
+
+    __host__ __device__
+        float operator()(const VectorXd& x, const float& d) const {
+					VectorXd d2 = x - c;
+          return min(d2.norm(), d);
+        }
+};
 
 // GPU Algorithm
 // template<typename Rand>
