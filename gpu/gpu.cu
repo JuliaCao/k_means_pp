@@ -108,7 +108,7 @@ void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 
 // GPU Indexing
 
-template<typename Rand>
+// template<typename Rand>
 struct prob_reduce
 {
     __host__ __device__
