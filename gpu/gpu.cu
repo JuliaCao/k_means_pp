@@ -118,7 +118,7 @@ int main( int argc, char** argv ){
 	// generate_data(X,mat_rand);
 	double t0 = read_timer( );
   kpp_gpu(n, k, X, C, weight_rand);
-	t1 = read_timer( ) - t0;
+	double t1 = read_timer( ) - t0;
 
 	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS." << sep;
 	//cout << C << sep;
