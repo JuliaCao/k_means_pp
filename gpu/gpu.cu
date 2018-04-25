@@ -149,7 +149,7 @@ void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
 	int index = (int)(r() * n);
 	C[0] = X[index];
 	for(int j = 1; j < k; j++){
-			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
+			// thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
 			// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
 			//int i = weighted_rand_index(D, r);
 			// C[j] = X[i];
@@ -179,7 +179,7 @@ int main( int argc, char** argv ){
 	float inf = numeric_limits<float>::max();
 	thrust::device_vector<float> D(n);
 	thrust::fill(D.begin(), D.end(), inf);
-	thrust::device_ptr(D)
+	// thrust::device_ptr(D)
 	thrust::device_vector<int> I(n);
 	thrust::sequence(I.begin(), I.end());
 
