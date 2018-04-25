@@ -15,6 +15,7 @@
 Author: Alexander Dunn
 University of California, 2018
 CS 267 Final Project: Parallelizing K-means++ Initialization
+GPU portion
 */
 
 #if defined __GNUC__ || defined __APPLE__
@@ -146,7 +147,7 @@ int main( int argc, char** argv ){
 	double t0 = read_timer( );
   kpp_gpu(n, k, X, C, weight_rand);
 	double t1 = read_timer( ) - t0;
-	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS.";
+	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
 
 
 	// Initializing Data
@@ -156,6 +157,6 @@ int main( int argc, char** argv ){
 	double t2 = read_timer( );
   kpp_serial(n, k, X, C, weight_rand);
 	double t3 = read_timer( ) - t2;
-	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS.";
+	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS. \n";
 	cout << "THE RESULTING SPEEDUP IS: " << t2/t1 << sep;
 }
