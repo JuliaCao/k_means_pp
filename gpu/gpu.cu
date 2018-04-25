@@ -153,8 +153,8 @@ void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
 	for(int j = 1; j < k; j++){
 			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
 			tuple<float, int> redtuple = thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), prob_reduce());
-			int i = get<1>(redtuple);
-			C[j] = X[i];
+			int ix = get<1>(redtuple);
+			C[j] = X[ix];
 			}
 	return;
 }
