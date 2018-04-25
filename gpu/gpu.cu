@@ -59,22 +59,26 @@ void kpp_gpu(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 	}
 
 	// The first seed is selected uniformly at random
-	int index = (int)r() * n;
-	C(0) = X(index);
+	int index = (int)(r() * n);
+	C.row(0) = X.row(index);
+	cout << "picking idx " << index << endl;
 
 	for(int j = 1; j < k; j++){
-   	  for(auto i = 0;  i < n; i++){
-      	VectorXd c = C.row(j-1);
-        VectorXd x = X.row(i);
-        VectorXd tmp = c - x;
-    		D(i) = min(tmp.norm(),D(i));
-    	}
+			for(auto i = 0; i < n;i++){
+					VectorXd c = C.row(j-1);
+					VectorXd x = X.row(i);
+					VectorXd tmp = c - x;
+				D(i) = min(tmp.norm(), D(i));
+			}
 
-	  int i = weighted_rand_index(D, r);
-	  C(j) = X(i);
+		int i = weighted_rand_index(D,r);
+	cout << "i = " << i << endl;
+	C.row(j) = X.row(i);
 	}
+	cout << "C =" << C << endl;
 	return;
 }
+
 
 int main( int argc, char** argv ){
 
