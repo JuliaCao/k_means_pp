@@ -3,6 +3,7 @@
 #include <limits>
 #include <functional>
 #include <cstdint>
+#include <omp.h>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
@@ -13,9 +14,9 @@
 using namespace std;
 using namespace Eigen;
 
-#define M 2
-#define K 10
-#define N 1000
+#define M 5
+#define K 2
+#define N 10
 
 // template<typename Rand>
 //  void generate_data(MatrixXd& data, Rand& r){
@@ -71,13 +72,16 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 }
 
 template<typename Rand>
-void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
+void kpp_serial(MatrixXd& X,MatrixXd& C, Rand& r){
 
+
+    int p = omp_get_num_threads();//#threads
     vector<int> I(p,0);
     VectorXd S(p);
 
     VectorXd D(N);
 
+    #pragma omp parallel for
     for(int i  = 0 ; i < N ; i++){
     	D(i) = numeric_limits<float>::max();
     }
@@ -88,6 +92,7 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
     for(int j = 1; j < K; j++){
 
+    	#pragma omp parallel for
     	for(int t = 0; t < p; t++){
     		int lo = t * (N / p);
     		int hi = min(lo + N/p, N-1);
@@ -167,11 +172,13 @@ int main( int argc, char** argv ){
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
 	auto mat_rand = bind(dist,ref(rd));
 	auto weight_rand = bind(zero_one,ref(rd));
+
 	MatrixXd X = MatrixXd::Random(N,M);
 	MatrixXd C(K,M);
 
 
 	// generate_data(X,mat_rand);
   kpp_serial(X, C, weight_rand);
+	cout >> C >> "\n";
 	// output_kmeans_pp()
 }
