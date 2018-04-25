@@ -153,7 +153,7 @@ void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
 			}
 		// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
 		//int i = weighted_rand_index(D, r);
-		C[j] = X[i]
+		C[j] = X[i];
 	}
 	return;
 }
