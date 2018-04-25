@@ -146,15 +146,16 @@ int main( int argc, char** argv ){
 	double t0 = read_timer( );
   kpp_gpu(n, k, X, C, weight_rand);
 	double t1 = read_timer( ) - t0;
-	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS." << sep;
+	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS.";
 
 
 	// Initializing Data
-	cout << sep << "RUNNING KMEANS++ SERIAL WITH SAME" << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+	cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	C = MatrixXd::Zero(k, m);
 	// Running serial simulation
 	double t2 = read_timer( );
   kpp_serial(n, k, X, C, weight_rand);
 	double t3 = read_timer( ) - t2;
-	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS." << sep;
+	cout << "THE SERIAL/CPU SIMULATION TOOK " << t1 << " SECONDS.";
+	cout << "THE RESULTING SPEEDUP IS: " << t2/t1 << sep;
 }
