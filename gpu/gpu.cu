@@ -152,7 +152,7 @@ int main( int argc, char** argv ){
 	// Initializing Data
 	cout << sep << "RUNNING KMEANS++ SERIAL WITH SAME" << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	auto weight_rand = bind(zero_one, ref(rd));
-	C = MatrixXd::Zero(k, m)
+	C = MatrixXd::Zero(k, m);
 	// Running serial simulation
 	double t2 = read_timer( );
   kpp_serial(n, k, X, C, weight_rand);
