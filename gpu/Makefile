@@ -2,7 +2,7 @@ NVCC = nvcc
 CC = g++
 CFLAGS = -O3 -arch=compute_37 -code=sm_37 -std=c++11
 NVCCFLAGS = -O3 -arch=compute_37 -code=sm_37 -std=c++11
-TARGETS = gpu serial
+TARGETS = serial gpu
 
 all: gpu
 
@@ -12,7 +12,6 @@ gpu: gpu.o
 
 serial: serial.cpp
 	$(CC) -o $@ $(CFLAGS) serial
-	rm -f serial.o
 
 gpu.o: gpu.cu
 	$(NVCC) -c $(NVCCFLAGS) gpu.cu
