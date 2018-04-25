@@ -36,6 +36,26 @@ int weighted_rand_index(VectorXd& W,Rand& r){
 }
 
 template<typename Rand>
+int weighted_rand_index_bound(VectorXd& W, Rand& r, int lo, int hi){
+    double culmulative = 0;
+    for(int i = lo; i < hi; i++){
+        culmulative += W(i);
+    }
+
+    culmulative *= r();
+
+    int index = lo;
+    double s = W(lo);
+
+    while(s < culmulative){
+        index++;
+        s += W(index);
+    }
+    return index;
+}
+
+
+template<typename Rand>
 void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
     int p = omp_get_num_threads();//#threads
