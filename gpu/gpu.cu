@@ -75,10 +75,11 @@ int weighted_rand_index(VectorXd& W, Rand& r){
 template<typename Rand>
 void kpp_gpu(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 
-	VectorXd D(n);
-	for(int i  = 0 ; i < n ; i++){
-		D(i) = numeric_limits<float>::max();
-	}
+	float inf = numeric_limits<float>::max();
+	thrust::device_vector<float> D_gpu(n);
+	thrust::fill(D_gpu.begin(), D_gpu.end(), inf);
+	float* D_gpu_ptr = &D_gpu[0];
+	Map<VectorXd> D(D_gpu_ptr, n);
 
 	// The first seed is selected uniformly at random
 	int index = (int)(r() * n);
