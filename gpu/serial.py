@@ -5,10 +5,9 @@ import pandas as pd
 from sklearn.cluster import KMeans
 
 # Hyper parameters
-M = 2
-K = 10
-N = 1000
-
+M = 5
+K = 2
+N = 10
 
 def generate_data():
     data = np.random.randn(N, M)
@@ -34,7 +33,7 @@ def kpp_serial(X, K):
             D[i] = min(np.linalg.norm(X[i] - C[j - 1]), D[i])
         i = weighted_rand_index(D)
         C[j] = X[i]
-        print("C[j] selected:", C[j])
+        print("C[{}] selected: {}".format(j,  C[j]))
     return C
 
 def weighted_rand_index(W):
@@ -81,8 +80,11 @@ def compare_kmeans(nruns=1000):
 
 if __name__ == "__main__":
     X = generate_data()
+    print("X is: \n", X)
     C = kpp_serial(X, K)
 
+    print("C is \n", C)
+    print(C)
     # compare_kmeans()
-    plot_kmeans_pp()
+    # plot_kmeans_pp()
     # plot_kmeans()
