@@ -11,6 +11,7 @@
 #include <thrust/fill.h>
 #include <thrust/transform.h>
 #include <thrust/reduce.h>
+#include <thrust/sequence.h>
 
 /*
 Author: Alexander Dunn
@@ -79,9 +80,16 @@ void kpp_gpu(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 	float inf = numeric_limits<float>::max();
 	thrust::device_vector<float> D_gpu(n);
 	thrust::fill(D_gpu.begin(), D_gpu.end(), inf);
-	thrust::device_ptr<float> D_gpu_ptr = D_gpu.data()
+	thrust::device_vector<int> I_gpu(n);
+	thrust::sequence(I_gpu.begin(), I_gpu.end());
+	// thrust::device_ptr<float> D_gpu_ptr = D_gpu.data();
 	//float* D_gpu_ptr = &D_gpu[0];
-	Map<VectorXd> D(D_gpu_ptr, n);
+	// Map<VectorXd> D(D_gpu_ptr, n);
+
+	VectorXd D(n);
+	for(int i  = 0 ; i < n ; i++){
+		D(i) = numeric_limits<float>::max();
+	}
 
 	// The first seed is selected uniformly at random
 	int index = (int)(r() * n);
@@ -94,7 +102,7 @@ void kpp_gpu(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 				D(i) = min(tmp.norm(), D(i));
 			}
 
-		int i = weighted_rand_index(D,r);
+		int i = weighted_rand_index(D, r);
 	C.row(j) = X.row(i);
 	}
 	return;
