@@ -112,7 +112,7 @@ template<typename Rand>
 struct prob_reduce
 {
     __host__ __device__
-        tuple operator()(const tuple<float, int>& t1, const tuple<float, int>& t2) const {
+        tuple<float, int> operator()(const tuple<float, int>& t1, const tuple<float, int>& t2) const {
 					float w1 = t1[0];
 					float w2 = t2[0];
 					int i1 = t1[1];
