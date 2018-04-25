@@ -108,24 +108,24 @@ void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
 
 // GPU Indexing
 
-template<typename Rand>
-struct prob_reduce
-{
-    __host__ __device__
-        tuple<float, int> operator()(const tuple<float, int>& t1, const tuple<float, int>& t2) const {
-					float w1 = t1[0];
-					float w2 = t2[0];
-					int i1 = t1[1];
-					int i2 = t2[1];
-					float rval = r() * (w1 + w2);
-					if (rval > w1){
-						return make_tuple(w1 + w2, i2);
-					}
-					else{
-						return make_tuple(w1 + w2, i1);
-					}
-        }
-};
+// template<typename Rand>
+// struct prob_reduce
+// {
+//     __host__ __device__
+//         tuple<float, int> operator()(const tuple<float, int>& t1, const tuple<float, int>& t2) const {
+// 					float w1 = t1[0];
+// 					float w2 = t2[0];
+// 					int i1 = t1[1];
+// 					int i2 = t2[1];
+// 					float rval = r() * (w1 + w2);
+// 					if (rval > w1){
+// 						return make_tuple(w1 + w2, i2);
+// 					}
+// 					else{
+// 						return make_tuple(w1 + w2, i1);
+// 					}
+//         }
+// };
 
 // struct D_functor
 // {
