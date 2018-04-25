@@ -117,8 +117,6 @@ struct prob_reduce
 					float w2 = get<0>(t2);
 					int i1 = get<1>(t1);
 					int i2 = get<1>(t2);
-
-					// NEED TO PUT ACTUAL R VALUE IN!!!
 					float rval = 0.2837472 * (w1 + w2);
 					if (rval > w1){
 						return make_tuple(w1 + w2, i2);
@@ -142,21 +140,21 @@ struct D_functor
 };
 
 // GPU Algorithm
-template<typename Rand>
-void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
-	thrust::device_vector<int> I, thrust::device_vector<VectorXd> &X,
-	thrust::device_vector<VectorXd> &C, Rand &r) {
-
-	// The first seed is selected uniformly at random
-	int index = (int)(r() * n);
-	C[0] = X[index];
-	for(int j = 1; j < k; j++){
-			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
-			// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
-			// C[j] = X[i];
-			}
-	return;
-}
+// template<typename Rand>
+// void kpp_gpu(int n, int k, thrust::device_vector<float> &D,
+// 	thrust::device_vector<int> I, thrust::device_vector<VectorXd> &X,
+// 	thrust::device_vector<VectorXd> &C, Rand &r) {
+//
+// 	// The first seed is selected uniformly at random
+// 	int index = (int)(r() * n);
+// 	C[0] = X[index];
+// 	for(int j = 1; j < k; j++){
+// 			thrust::transform(X.begin(), X.end(), D.begin(), D.begin(), D_functor(C[j-1]));
+// 			// thrust::reduce(D.begin(), D.end(), I.begin(), I.end(), )
+// 			// C[j] = X[i];
+// 			}
+// 	return;
+// }
 
 int main( int argc, char** argv ){
 
@@ -197,19 +195,19 @@ int main( int argc, char** argv ){
 	}
 
 	// Running GPU simulation
-	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	double t0 = read_timer( );
-  kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
-	double t1 = read_timer( ) - t0;
-	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
+	// cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+	// double t0 = read_timer( );
+  // kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
+	// double t1 = read_timer( ) - t0;
+	// cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
 
 
 	// Initializing Data
-	cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	// Running serial simulation
-	double t2 = read_timer( );
-  kpp_serial(n, k, X_serial, C_serial, weight_rand_serial);
-	double t3 = read_timer( ) - t2;
-	cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
-	cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
+	// cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+	// // Running serial simulation
+	// double t2 = read_timer( );
+  // kpp_serial(n, k, X_serial, C_serial, weight_rand_serial);
+	// double t3 = read_timer( ) - t2;
+	// cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
+	// cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
 }
