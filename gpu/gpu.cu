@@ -194,12 +194,12 @@ int main( int argc, char** argv ){
 		X_serial.row(i) = randarr;
 	}
 
-	// Running GPU simulation
-	// cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	// double t0 = read_timer( );
-  // kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
-	// double t1 = read_timer( ) - t0;
-	// cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
+	Running GPU simulation
+	cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+	double t0 = read_timer( );
+  kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
+	double t1 = read_timer( ) - t0;
+	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
 
 
 	// Initializing Data
