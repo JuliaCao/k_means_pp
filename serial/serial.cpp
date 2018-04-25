@@ -181,6 +181,6 @@ int main( int argc, char** argv ){
 
 	// generate_data(X,mat_rand);
   kpp_serial(X, C, weight_rand);
-	cout >> C >> "\n";
+	cout << C << "\n";
 	// output_kmeans_pp()
 }
