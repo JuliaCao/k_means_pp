@@ -4,6 +4,8 @@
 #include <functional>
 #include <cstdint>
 #include <omp.h>
+#include <iostream>
+#include <ctime>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
@@ -14,9 +16,9 @@
 using namespace std;
 using namespace Eigen;
 
-#define M 2
-#define K 10
-#define N 1000
+#define M 3
+#define K 5
+#define N 100
 
 // template<typename Rand>
 //  void generate_data(MatrixXd& data, Rand& r){
@@ -53,20 +55,23 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 	}
 
 	// The first seed is selected uniformly at random
-	int index = (int)r() * N;
-	C(0) = X(index);
+	int index = (int)(r() * N);
+	C.row(0) = X.row(index);
+	cout << "picking idx " << index << endl;
 
 	for(int j = 1; j < K; j++){
    	  for(auto i = 0;i<N;i++){
-      	VectorXd c = C.row(j-1);
-        VectorXd x = X.row(i);
-        VectorXd tmp = c - x;
+      		VectorXd c = C.row(j-1);
+        	VectorXd x = X.row(i);
+        	VectorXd tmp = c - x;
     		D(i) = min(tmp.norm(),D(i));
     	}
 
 	  int i = weighted_rand_index(D,r);
-	  C(j) = X(i);
+	cout << "i = " << i << endl; 
+	  C.row(j) = X.row(i);
 	}
+	cout << "C =" << C << endl;
 
 	return;
 }
@@ -165,19 +170,21 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 
 
 int main( int argc, char** argv ){
+	srand((unsigned int)time(0));	
 
 	random_device rd;
 	// std::mt19937 e2(rd());
 	uniform_real_distribution<double> dist(-1.f, 1.f);
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
-	auto mat_rand = bind(dist,ref(rd));
+	//auto mat_rand = bind(dist,ref(rd));
 	auto weight_rand = bind(zero_one,ref(rd));
 
 	MatrixXd X = MatrixXd::Random(N,M);
 	MatrixXd C(K,M);
 
+	cout << "X" << X << endl;	
 
 	// generate_data(X,mat_rand);
-  kpp_serial(X, C, weight_rand);
+  	kpp_serial(X, C, weight_rand);
 	// output_kmeans_pp()
 }
