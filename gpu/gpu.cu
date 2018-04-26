@@ -127,12 +127,12 @@ int main( int argc, char** argv ){
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
 	auto weight_rand_gpu = bind(zero_one, ref(rd));
 	float inf = numeric_limits<float>::max();
-	thrust::device_vector<array> C(k);
-	thrust::device_vector<array> X(n);
-	thrust::device_vector<float> D(n);
-	thrust::fill(D.begin(), D.end(), inf);
-	thrust::device_vector<int> I(n);
-	thrust::sequence(I.begin(), I.end());
+	// thrust::device_vector<array> C(k);
+	// thrust::device_vector<array> X(n);
+	// thrust::device_vector<float> D(n);
+	// thrust::fill(D.begin(), D.end(), inf);
+	// thrust::device_vector<int> I(n);
+	// thrust::sequence(I.begin(), I.end());
 
 	// Populating gpu arrays
 	for (int i  = 0 ; i < n ; i++){
