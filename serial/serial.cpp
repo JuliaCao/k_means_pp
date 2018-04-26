@@ -7,6 +7,8 @@
 #include <omp.h>
 #include <iostream>
 #include <ctime>
+#include <time.h>
+#include <sys/time.h>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
@@ -17,9 +19,9 @@
 using namespace std;
 using namespace Eigen;
 
-#define M 3
-#define K 5
-#define N 100
+int N;
+int M;
+int K;
 
 // template<typename Rand>
 //  void generate_data(MatrixXd& data, Rand& r){
@@ -33,6 +35,45 @@ using namespace Eigen;
 
 //  return;
 // }
+
+int find_option( int argc, char **argv, const char *option )
+{
+    for( int i = 1; i < argc; i++ )
+        if( strcmp( argv[i], option ) == 0 )
+            return i;
+    return -1;
+}
+
+double read_timer( )
+{
+    static bool initialized = false;
+    static struct timeval start;
+    struct timeval end;
+    if( !initialized )
+    {
+        gettimeofday( &start, NULL );
+        initialized = true;
+    }
+    gettimeofday( &end, NULL );
+    return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
+}
+
+int read_int( int argc, char **argv, const char *option, int default_value )
+{
+    int iplace = find_option( argc, argv, option );
+    if( iplace >= 0 && iplace < argc-1 )
+        return atoi( argv[iplace+1] );
+    return default_value;
+}
+
+char *read_string( int argc, char **argv, const char *option, char *default_value )
+{
+    int iplace = find_option( argc, argv, option );
+    if( iplace >= 0 && iplace < argc-1 )
+        return argv[iplace+1];
+    return default_value;
+}
+
 
 template<typename Rand>
 int weighted_rand_index(VectorXd& W,Rand& r){
@@ -48,7 +89,8 @@ int weighted_rand_index(VectorXd& W,Rand& r){
 }
 
 template<typename Rand>
-void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
+double kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
+    double STime = read_timer( );
 
     VectorXd D(N);
     for(int i  = 0 ; i < N ; i++){
@@ -58,7 +100,7 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
     // The first seed is selected uniformly at random
     int index = (int)(r() * N);
     C.row(0) = X.row(index);
-    cout << "picking idx " << index << endl;
+    // cout << "picking idx " << index << endl;
 
     for(int j = 1; j < K; j++){
       for(auto i = 0;i<N;i++){
@@ -69,73 +111,15 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
         }
 
       int i = weighted_rand_index(D,r);
-    cout << "i = " << i << endl; 
+    // cout << "i = " << i << endl; 
       C.row(j) = X.row(i);
     }
-    cout << "C =" << C << endl;
+    // cout << "C =" << C << endl;
 
-    return;
+    double CTime = read_timer( ) - STime;
+    return CTime;
 }
 
-template<typename Rand>
-void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
-
-
-    int p = omp_get_num_threads();//#threads
-    vector<int> I(p,0);
-    VectorXd S(p);
-
-    VectorXd D(N);
-
-    #pragma omp parallel for
-    for(int i  = 0 ; i < N ; i++){
-        D(i) = numeric_limits<float>::max();
-    }
-
-    // The first seed is selected uniformly at random
-    int index = (int)r() * N;
-    C.row(0) = X.row(index);
-
-    for(int j = 1; j < K; j++){
-
-        #pragma omp parallel for
-        for(int t = 0; t < p; t++){
-            int lo = t * (N / p);
-            int hi = min(lo + N/p, N-1);
-
-            //calculate weights for this part
-
-
-            S(t) = 0.0f;
-
-            for(auto i = lo;i<hi; i++){
-                if(j == 1){
-                    D(i) = (C.row(j-1) - X.row(i)).norm();
-                }
-                else{
-                    D(i) = min((X.row(i) - C.row(j-1)).norm(),D(i));
-                }
-                S(t) = S(t) + D(i);
-            }
-
-            int sub_i = lo+ weighted_rand_index_bound(D,r,lo,hi);
-
-            I[t] = sub_i;
-
-        }
-
-        // for(auto i = 0;i<N;i++){
-        //  D(i) = min((X(i) - C(j-1)).norm(),D(i));
-        // }
-
-      int sub_t = weighted_rand_index(S,r);
-      int i = I[sub_t];
-      C.row(j) = X.row(i);
-    }
-
-    return;
-
-}
 
 // def output_kmeans_pp():
 //     if X.shape[1] != 2 or C.shape[1] != 2:
@@ -168,9 +152,14 @@ void kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
 //             iters.append(km.n_iter_)
 //         print("Average {} n_iters needed: {}".format(initnames[i], np.mean(iters)))
 
-
-
 int main( int argc, char** argv ){
+    N = read_int( argc, argv, "-n", 100 );
+    K = read_int( argc, argv, "-k", 3 );
+    M = read_int( argc, argv, "-m", 2 );
+
+    char *savename = read_string( argc, argv, "-o", NULL );
+    FILE *fsave = savename ? fopen( savename, "a" ) : NULL;
+
     srand((unsigned int)time(0));   
 
     random_device rd;
@@ -183,9 +172,14 @@ int main( int argc, char** argv ){
     MatrixXd X = MatrixXd::Random(N,M);
     MatrixXd C(K,M);
 
-    cout << "X" << X << endl;   
+    // cout << "X" << X << endl;   
 
     // generate_data(X,mat_rand);
-    kpp_serial(X, C, weight_rand);
+    double CTime = kpp_serial(X, C, weight_rand);
+
+    if(fsave) {
+        fprintf( fsave, "N=%d M=%d K=%d Time=%.2f\n", N, M, K, CTime);
+        fclose( fsave );
+    }
     // output_kmeans_pp()
 }

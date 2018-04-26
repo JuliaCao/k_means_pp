@@ -1,4 +1,4 @@
-CC = gcc -std=gcc++0x
+CC = g++ -std=gcc++11
 target = opm
 OPENMP = -fopenmp
 
