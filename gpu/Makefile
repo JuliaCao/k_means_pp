@@ -6,17 +6,15 @@ TARGETS = serial
 
 all: $(TARGETS)
 
-serial: serial GPU
-
 serial: serial.o
-	$(CC) -o $@ $(CLIBS) serial.o
+	$(CC) -o $@ $(CLIBS) serial
 	rm -f serial.o
 
 serial.o: serial.cpp
 	$(CC) -c $(CFLAGS) serial.cpp
 
 gpu: gpu.o
-	$(NVCC) -o $@ $(NVCCLIBS) gpu.o
+	$(NVCC) -o $@ $(NVCCLIBS) gpu
 	rm -f gpu.o
 
 gpu.o: gpu.cu
