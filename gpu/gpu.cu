@@ -119,20 +119,19 @@ int main( int argc, char** argv ){
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
 	auto weight_rand_gpu = bind(zero_one, ref(rd));
 	float inf = numeric_limits<float>::max();
-	thrust::device_vector<int> C[m](k);
-	thrust::device_vector<int> X[m](n);
+	thrust::device_vector<array> C(k);
+	thrust::device_vector<array> X(n);
 	thrust::device_vector<float> D(n);
 	thrust::fill(D.begin(), D.end(), inf);
 	thrust::device_vector<int> I(n);
 	thrust::sequence(I.begin(), I.end());
 
-	// // Populating both serial and gpu arrays
-	// float randarr [n];
-	// for (int i  = 0 ; i < n ; i++){
-	// 	randarr = VectorXd::Random(m);
-	// 	X_gpu[i] = randarr;
-	// 	X_serial.row(i) = randarr;
-	// }
+	// Populating gpu arrays
+	float randarr [n];
+	for (int i  = 0 ; i < n ; i++){
+		randarr = VectorXd::Random(m);
+		X[i] = randarr;
+	}
 
 	// // Running GPU simulation
 	// cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
