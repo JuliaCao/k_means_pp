@@ -128,7 +128,7 @@ int main( int argc, char** argv ){
 	auto weight_rand_gpu = bind(zero_one, ref(rd));
 	float inf = numeric_limits<float>::max();
 	// thrust::device_vector<array> C(k);
-	// thrust::device_vector<array> X(n);
+	thrust::device_vector<array> X(n);
 	// thrust::device_vector<float> D(n);
 	// thrust::fill(D.begin(), D.end(), inf);
 	// thrust::device_vector<int> I(n);
