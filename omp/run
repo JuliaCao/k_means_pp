@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH -A cc3uv3p # 2017 XSEDE Applications of Parallel Computing Course Allocation
+#SBATCH -J auto-omp
+#SBATCH -o auto-omp.out
+#SBATCH -t 00:10:00
+#SBATCH -N 1
+#SBATCH --ntasks-per-node=24
+
+for nn in 100000 1000000 10000000:
+do
+    echo $nn
+    for mm in 1 10 100 1000:
+        do
+            for kk in 2 5 10:
+            do
+		for t in 1 2 4 6 12 18 24
+		do
+                    ./omp -o omp.out -n $nn -m $mm -k $kk -p $t
+		done
+            done
+        done
+done

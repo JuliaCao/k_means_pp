@@ -1,4 +1,3 @@
-
 #include <cstdio>
 #include <random>
 #include <limits>
@@ -22,19 +21,6 @@ using namespace Eigen;
 int N;
 int M;
 int K;
-
-// template<typename Rand>
-//  void generate_data(MatrixXd& data, Rand& r){
-//  // MatrixXf data(N,M);
-
-//  for(int i = 0;i<N;i++){
-//      for(int j = 0; j < M ; j++){
-//          data(i,j) = r();
-//      }
-//  }
-
-//  return;
-// }
 
 int find_option( int argc, char **argv, const char *option )
 {
@@ -74,88 +60,113 @@ char *read_string( int argc, char **argv, const char *option, char *default_valu
     return default_value;
 }
 
-
 template<typename Rand>
 int weighted_rand_index(VectorXd& W,Rand& r){
-    double culmulative = W.sum() * r();
-    int i = 0;
-    double s = W(0);
-    while (s < culmulative){
-        i++;
-      s += W(i);
-    }
+	double culmulative = W.sum() * r();
+	int i = 0;
+	double s = W(0);
+	while (s < culmulative){
+		i++;
+	  s += abs(W(i));
+	}
 
-    return i;
+	return i;
 }
 
 template<typename Rand>
-double kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
-    double STime = read_timer( );
+int weighted_rand_index_bound(VectorXd& W, Rand& r, int lo, int hi){
+    double culmulative = 0;
+    for(int i = lo; i < hi; i++){
+        culmulative += W(i);
+    }
+
+    culmulative *= r();
+
+    int index = lo;
+    double s = W(lo);
+
+    while(s < culmulative){
+        index++;
+        s += abs(W(index));
+    }
+    return index;
+}
+
+
+template<typename Rand>
+double kpp_openmp(MatrixXd& X,MatrixXd& C, Rand& r){
+    int p;
+    #pragma omp parallel
+    {
+    p = omp_get_num_threads();//#threads
+    //cout << "total # of threads" << p << endl;
+    }
+
+    vector<int> I(p,0);
+    VectorXd S(p);
 
     VectorXd D(N);
+
+    double STime = read_timer( );
+
+    #pragma omp parallel for
     for(int i  = 0 ; i < N ; i++){
-        D(i) = numeric_limits<float>::max();
+    	D(i) = numeric_limits<float>::max();
     }
 
     // The first seed is selected uniformly at random
-    int index = (int)(r() * N);
+    int index = (int)r() * N;
     C.row(0) = X.row(index);
-    // cout << "picking idx " << index << endl;
 
     for(int j = 1; j < K; j++){
-      for(auto i = 0;i<N;i++){
-            VectorXd c = C.row(j-1);
-            VectorXd x = X.row(i);
-            VectorXd tmp = c - x;
-            D(i) = min(tmp.norm(),D(i));
-        }
 
-      int i = weighted_rand_index(D,r);
-    // cout << "i = " << i << endl; 
+    	#pragma omp parallel for schedule(dynamic)
+    	for(int t = 0; t < p; t++){
+	//	cout << "thread" << omp_get_thread_num() << endl;
+    		int lo = t * (N / p);
+    		int hi = min(lo + N/p, N-1);
+
+    		//calculate weights for this part
+
+
+		    S(t) = 0.0f;
+
+		    for(int i = lo;i<hi; i++){
+		    	if(j == 1){
+		    		D(i) = (C.row(j-1) - X.row(i)).norm();
+		    	}
+		    	else{
+		    		D(i) = min((X.row(i) - C.row(j-1)).norm(),D(i));
+		    	}
+		    	S(t) = S(t) + D(i);
+		    }
+
+		    int sub_i = weighted_rand_index_bound(D,r,lo,hi);
+		    //cout << "select idx per thread" << sub_i << endl;
+		    I[t] = sub_i;
+
+    	}
+
+    	// for(auto i = 0;i<N;i++){
+    	// 	D(i) = min((X(i) - C(j-1)).norm(),D(i));
+    	// }
+
+      int sub_t = weighted_rand_index(S,r);
+      int i = I[sub_t];
+//      cout << "select idx" << i << endl;
       C.row(j) = X.row(i);
+//	cout << "C" << C << endl;
     }
-    // cout << "C =" << C << endl;
-
     double CTime = read_timer( ) - STime;
     return CTime;
 }
 
 
-// def output_kmeans_pp():
-//     if X.shape[1] != 2 or C.shape[1] != 2:
-//         raise ValueError("M must be 2 dimensions to plot.")
-//     plt.scatter(X[:, 0], X[:, 1], color='black')
-//     plt.scatter(C[:, 0], C[:, 1], color='red')
-//     plt.show()
-
-
-// def plot_kmeans():
-//     if X.shape[1] != 2 or C.shape[1] != 2:
-//         raise ValueError("M must be 2 dimensions to plot.")
-//     km = KMeans(n_clusters=K, init=C, n_init=1)
-//     labels = km.fit_predict(X)
-//     rancols = [np.random.rand(3).tolist() for _ in range(max(labels) + 1)]
-//     colmap = dict(zip(range(max(labels) + 1), rancols))
-//     colors = [colmap[l] for l in labels]
-//     for i in range(X.shape[0]):
-//         plt.scatter(X[i][0], X[i][1], c=colors[i], s=3)
-//     plt.show()
-
-// def compare_kmeans(nruns=1000):
-//     initnames = ["ours", "sklearn", "random"]
-//     for i, init in enumerate([C, 'k-means++', 'random']):
-//         iters = []
-//         for run in range(nruns):
-//             # print("Run {} in {}".format(run, init))
-//             km = KMeans(n_clusters=K, init=init, n_init=1)
-//             km.fit_predict(X)
-//             iters.append(km.n_iter_)
-//         print("Average {} n_iters needed: {}".format(initnames[i], np.mean(iters)))
-
 int main( int argc, char** argv ){
     N = read_int( argc, argv, "-n", 100 );
     K = read_int( argc, argv, "-k", 3 );
     M = read_int( argc, argv, "-m", 2 );
+    int P = read_int( argc, argv, "-p", 1 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     FILE *fsave = savename ? fopen( savename, "a" ) : NULL;
@@ -175,10 +186,11 @@ int main( int argc, char** argv ){
     // cout << "X" << X << endl;   
 
     // generate_data(X,mat_rand);
-    double CTime = kpp_serial(X, C, weight_rand);
+    double CTime = kpp_openmp(X, C, weight_rand);
 
     if(fsave) {
-        fprintf( fsave, "N=%d M=%d K=%d Time=%.2f\n", N, M, K, CTime);
+        fprintf( fsave, "N=%d M=%d K=%d Time=%.2f #threads=%d\n", 
+        	N, M, K, CTime, P);
         fclose( fsave );
     }
     // output_kmeans_pp()
