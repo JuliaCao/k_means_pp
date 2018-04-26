@@ -21,14 +21,7 @@ CS 267 Final Project: Parallelizing K-means++ Initialization
 GPU portion
 */
 
-#if defined __GNUC__ || defined __APPLE__
-#include <Eigen/Dense>
-#else
-#include <eigen3/Eigen/Dense>
-#endif
-
 using namespace std;
-using namespace Eigen;
 
 // Command line parsing and timing: from Homework 2.3 starter files common.cu
 int find_option( int argc, char **argv, const char *option )
@@ -60,49 +53,6 @@ double read_timer( )
     gettimeofday( &end, NULL );
     return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
-
-// Serial Indexing
-template<typename Rand>
-int weighted_rand_index(VectorXd& W, Rand& r){
-	double culmulative = W.sum() * r();
-	int i = 0;
-	double s = W(0);
-	while (s < culmulative){
-		i++;
-	  s += W(i);
-	}
-	return i;
-}
-
-// Serial Algorithm
-template<typename Rand>
-void kpp_serial(int n, int k, MatrixXd &X, MatrixXd &C, Rand &r) {
-
-	VectorXd D(n);
-	for(int i  = 0 ; i < n ; i++){
-		D(i) = numeric_limits<float>::max();
-	}
-
-	// The first seed is selected uniformly at random
-	int index = (int)(r() * n);
-	C.row(0) = X.row(index);
-	for(int j = 1; j < k; j++){
-			for(auto i = 0; i < n;i++){
-					VectorXd c = C.row(j-1);
-					VectorXd x = X.row(i);
-					VectorXd tmp = c - x;
-				D(i) = min(tmp.norm(), D(i));
-			}
-
-		int i = weighted_rand_index(D,r);
-	C.row(j) = X.row(i);
-	}
-	return;
-}
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -187,7 +137,7 @@ int main( int argc, char** argv ){
 	MatrixXd C_serial(k, m);
 
 			// Populating both serial and gpu arrays
-	VectorXd randarr;
+	float randarr [n];
 	for (int i  = 0 ; i < n ; i++){
 		randarr = VectorXd::Random(m);
 		X_gpu[i] = randarr;
@@ -200,14 +150,4 @@ int main( int argc, char** argv ){
   kpp_gpu(n, k, D_gpu, I_gpu, X_gpu, C_gpu, weight_rand_gpu);
 	double t1 = read_timer( ) - t0;
 	cout << "THE GPU SIMULATION TOOK " << t1 << " SECONDS. \n";
-
-
-	// Initializing Data
-	// cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
-	// // Running serial simulation
-	// double t2 = read_timer( );
-  // kpp_serial(n, k, X_serial, C_serial, weight_rand_serial);
-	// double t3 = read_timer( ) - t2;
-	// cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
-	// cout << "THE RESULTING SPEEDUP IS: " << t3/t1 << sep;
 }
