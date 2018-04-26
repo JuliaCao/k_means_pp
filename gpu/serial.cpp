@@ -113,10 +113,10 @@ int main( int argc, char** argv ){
 	MatrixXd C(k, m);
 
 	// Running Simulation
-	cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
+	cout << sep << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	// Running serial simulation
 	double t2 = read_timer( );
   kpp_serial(n, k, X, C, weight_rand);
 	double t3 = read_timer( ) - t2;
-	cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS. \n";
+	cout << "THE SERIAL/CPU SIMULATION TOOK " << t3 << " SECONDS." << sep;
 }
