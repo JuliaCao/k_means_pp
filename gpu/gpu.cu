@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstdlib>
 #include <random>
 #include <limits>
 #include <functional>
@@ -54,6 +55,13 @@ double read_timer( )
     return (end.tv_sec - start.tv_sec) + 1.0e-6 * (end.tv_usec - start.tv_usec);
 }
 
+float randarr(float low, float high, int m) {
+		ranarr float[m];
+		for (int j = 1; j < m; j++){
+			ranarr[i] = low + ((float) rand()) / (float) RAND_MAX * (hi - low));
+		}
+		return ranarr;
+}
 //////////////////////////////////////////////////////////////////////////////
 
 // GPU Indexing
@@ -127,11 +135,11 @@ int main( int argc, char** argv ){
 	thrust::sequence(I.begin(), I.end());
 
 	// Populating gpu arrays
-	float randarr [n];
 	for (int i  = 0 ; i < n ; i++){
-		randarr = VectorXd::Random(m);
-		X[i] = randarr;
+		X[i] = randarr(m, 2.0, 3.0);
 	}
+
+	cout << X;
 
 	// // Running GPU simulation
 	// cout << sep << "RUNNING KMEANS++ GPU WITH " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
