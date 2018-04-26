@@ -1,6 +1,6 @@
 NVCC = nvcc
 CC = g++
-CFLAGS = -O3 -arch=compute_37 -code=sm_37 -std=c++11
+CFLAGS = -O3 -std=c++11
 NVCCFLAGS = -O3 -arch=compute_37 -code=sm_37 -std=c++11
 TARGETS = serial
 
