@@ -4,6 +4,8 @@
 #include <functional>
 #include <cstdint>
 #include <iostream>
+#include <time.h>
+#include <sys/time.h>
 
 #if defined __GNUC__ || defined __APPLE__
 #include <Eigen/Dense>
