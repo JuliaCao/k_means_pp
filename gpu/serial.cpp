@@ -110,9 +110,7 @@ int main( int argc, char** argv ){
 	MatrixXd X = MatrixXd::Random(n, m);
 	MatrixXd C(k, m);
 
-  kpp_serial(X, C, weight_rand);
-
-	// Initializing Data
+	// Running Simulation
 	cout << "RUNNING KMEANS++ SERIAL WITH SAME " << n << " POINTS , " << k << " CLUSTERS, AND " << m << " DIMENSIONS.\n";
 	// Running serial simulation
 	double t2 = read_timer( );
