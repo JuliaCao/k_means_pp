@@ -118,11 +118,11 @@ int main( int argc, char** argv ){
 	random_device rd;
 	uniform_real_distribution<double> zero_one(0.f, 1.f);
 	auto weight_rand_gpu = bind(zero_one, ref(rd));
-	thrust::device_vector<vector> C(k);
-	thrust::device_vector<vector> X(n);
 	float inf = numeric_limits<float>::max();
+	thrust::device_vector<int> C[m](k);
+	thrust::device_vector<int> X[m](n);
 	thrust::device_vector<float> D(n);
-	thrust::fill(D_gpu.begin(), D_gpu.end(), inf);
+	thrust::fill(D.begin(), D.end(), inf);
 	thrust::device_vector<int> I(n);
 	thrust::sequence(I.begin(), I.end());
 
