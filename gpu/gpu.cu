@@ -56,9 +56,9 @@ double read_timer( )
 }
 
 float randarr(float low, float high, int m) {
-		ranarr float[m];
+		float ranarr[m];
 		for (int j = 1; j < m; j++){
-			ranarr[i] = low + ((float) rand()) / (float) RAND_MAX * (hi - low));
+			ranarr[i] = low + ((float) rand()) / (float) RAND_MAX * (high - low));
 		}
 		return ranarr;
 }
