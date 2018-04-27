@@ -5,7 +5,7 @@ OPENMP = -fopenmp
 all: omp
 
 serial: omp.cpp
-	$(CC) $(OPENMP) serial.cpp  -o  serial
+	$(CC) $(OPENMP) omp.cpp  -o  serial
 
 clean:
 	rm -f $(target)

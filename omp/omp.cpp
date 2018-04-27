@@ -10,10 +10,10 @@
 #include <sys/time.h>
 
 #if defined __GNUC__ || defined __APPLE__
-#include <Eigen/Dense>
-#else
-#include <eigen3/Eigen/Dense>
-#endif
+#include </global/homes/a/ardunn/eigen/Eigen/Dense>
+// #else
+// #include <eigen3/Eigen/Dense>
+// #endif
 
 using namespace std;
 using namespace Eigen;
@@ -171,7 +171,7 @@ int main( int argc, char** argv ){
     char *savename = read_string( argc, argv, "-o", NULL );
     FILE *fsave = savename ? fopen( savename, "a" ) : NULL;
 
-    srand((unsigned int)time(0));   
+    srand((unsigned int)time(0));
 
     random_device rd;
     // std::mt19937 e2(rd());
@@ -183,13 +183,13 @@ int main( int argc, char** argv ){
     MatrixXd X = MatrixXd::Random(N,M);
     MatrixXd C(K,M);
 
-    // cout << "X" << X << endl;   
+    // cout << "X" << X << endl;
 
     // generate_data(X,mat_rand);
     double CTime = kpp_openmp(X, C, weight_rand);
 
     if(fsave) {
-        fprintf( fsave, "N=%d M=%d K=%d Time=%.2f #threads=%d\n", 
+        fprintf( fsave, "N=%d M=%d K=%d Time=%.2f #threads=%d\n",
         	N, M, K, CTime, P);
         fclose( fsave );
     }
