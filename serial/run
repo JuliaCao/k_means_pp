@@ -22,13 +22,11 @@
 
 
 nn=1000000
-do
-  echo $nn
-  for mm in 1000 5000:
-      do
-          for kk in 2 5 10:
-          do
-						./serial -o serial.out -n $nn -m $mm -k $kk
-    			done
-			done
-done
+echo $nn
+for mm in 1000 5000:
+  do
+      for kk in 2 5 10:
+		    do
+					./serial -o serial.out -n $nn -m $mm -k $kk
+				done
+	done
