@@ -10,12 +10,12 @@
 
 for nn in 10000 100000 1000000 10000000:
 do
-    echo $nn
-    for mm in 5 10 100 1000 10000:
-        do
-            for kk in 1 10 100 1000:
-            do
-							./serial -o serial.out -n $nn -m $mm -k $kk
-	    			done
-				done
+  echo $nn
+  for mm in 5 10 100 1000 10000:
+      do
+          for kk in 1 10 100 1000:
+          do
+						./serial -o serial.out -n $nn -m $mm -k $kk
+    			done
+			done
 done
