@@ -1,0 +1,5 @@
+omp code goes in this uniform_real_distribution
+
+
+Improvements:
+We could add AVX-512 intrinsics to improve performance on KNL

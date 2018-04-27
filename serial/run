@@ -8,10 +8,23 @@
 #SBATCH -o openmp_res.txt
 #SBATCH -e openmp_res.txt
 
-for nn in 1000 10000 100000 1000000:
+# for nn in 1000 10000 100000 1000000:
+# do
+#   echo $nn
+#   for mm in 1 10 1000 5000:
+#       do
+#           for kk in 2 5 10:
+#           do
+# 						./serial -o serial.out -n $nn -m $mm -k $kk
+#     			done
+# 			done
+# done
+
+
+nn=1000000
 do
   echo $nn
-  for mm in 1 10 1000 5000:
+  for mm in 1000 5000:
       do
           for kk in 2 5 10:
           do
