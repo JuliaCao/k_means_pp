@@ -28,7 +28,7 @@ export OMP_NUM_THREADS=32
 
 nn=1000000
 echo $nn
-for mm in 1000 5000:
+for mm in 1 10 1000 5000:
   do
       for kk in 2 5 10:
       do

@@ -10,17 +10,31 @@
 
 export OMP_NUM_THREADS=68
 
-for nn in 1000 10000 100000 1000000:
-do
-  echo $nn
-  for mm in 1 10 1000 5000:
+# for nn in 1000 10000 100000 1000000:
+# do
+#   echo $nn
+#   for mm in 1 10 1000 5000:
+#       do
+#           for kk in 2 5 10:
+#           do
+# 							for pp in 2 4 8 16 32 48 68
+# 							do
+# 								srun -N 1 -n 1 -c 68 ./omp_knl -o omp_knl.out -n $nn -m $mm -k $kk -p $pp
+# 							done
+#             done
+#         done
+# done
+
+
+nn=1000000
+echo $nn
+for mm in 1 10 1000 5000:
+  do
+      for kk in 2 5 10:
       do
-          for kk in 2 5 10:
-          do
 							for pp in 2 4 8 16 32 48 68
 							do
 								srun -N 1 -n 1 -c 68 ./omp_knl -o omp_knl.out -n $nn -m $mm -k $kk -p $pp
 							done
             done
         done
-done
