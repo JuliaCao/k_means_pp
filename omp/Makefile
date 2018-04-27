@@ -9,6 +9,6 @@ all: omp
 omp: omp.o
 	$(CC) -o $@ $(LIBS) $(OPENMP) omp.o
 omp.o: omp.cpp
-	$(CC) -c $(OPENMP) $(CFLAGS) openmp.cpp
+	$(CC) -c $(OPENMP) $(CFLAGS) omp.cpp
 clean:
 	rm -f $(TARGETS)
