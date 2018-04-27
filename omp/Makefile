@@ -5,7 +5,7 @@ CFLAGS = -O3  -std=c++11
 LIBS =
 TARGETS = omp omp_alt
 
-all: omp omt_alt
+all: omp omp_alt
 omp: omp.o
 	$(CC) -o $@ $(LIBS) $(OPENMP) omp.o
 omp.o: omp.cpp
