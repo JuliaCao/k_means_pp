@@ -12,8 +12,7 @@ omp.o: omp.cpp
 	$(CC) -c $(OPENMP) $(CFLAGS) omp.cpp
 omp_alt: omp_alt.o
 	$(CC) -o $@ $(LIBS) $(OPENMP) omp_alt.o
-omp.o: omp_alt.cpp
+omp_alt.o: omp_alt.cpp
 	$(CC) -c $(OPENMP) $(CFLAGS) omp_alt.cpp
-
 clean:
 	rm -f $(TARGETS) *.o

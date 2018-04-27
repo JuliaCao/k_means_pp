@@ -3,7 +3,7 @@
 #SBATCH -C haswell
 #SBATCH -p debug      # change this option for non-debug runs
 #SBATCH -N 1          # you'll never need more than 1 node for the openmp code
-#SBATCH -t 00:05:00   # adjust the amount of time as necessary
+#SBATCH -t 00:10:00   # adjust the amount of time as necessary
 #SBATCH -J KMEANSOPENMP
 #SBATCH -o omp.out
 #SBATCH -e omp.out
@@ -20,6 +20,7 @@ do
 		for pp in 1 2 4 6 12 18 24 32
 		do
 			srun -N 1 -n 1 -c 32 ./omp -o omp.out -n $nn -m $mm -k $kk -p $pp
+			srun -N 1 -n 1 -c 32 ./omp -o omp_alt.out -n $nn -m $mm -k $kk -p $pp
 		done
   done
 done
