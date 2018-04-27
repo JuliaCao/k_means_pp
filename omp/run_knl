@@ -19,7 +19,7 @@ do
           do
 							for pp in 2 4 8 16 32 48 68
 							do
-								srun -N 1 -n 1 -c 32 ./omp_knl -o omp_knl.out -n $nn -m $mm -k $kk -p $pp
+								srun -N 1 -n 1 -c 68 ./omp_knl -o omp_knl.out -n $nn -m $mm -k $kk -p $pp
 							done
             done
         done
