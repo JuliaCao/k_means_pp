@@ -26,6 +26,15 @@ export OMP_NUM_THREADS=68
 # done
 
 
+nn=100000
+mm=5000:
+kk=10
+for pp in 2 4 8 16 24 32
+	do
+		srun -N 1 -n 1 -c 32 ./omp -o omp2.out -n $nn -m $mm -k $kk -p $pp
+	done
+
+
 nn=1000000
 echo $nn
 for mm in 1 10 1000 5000:
