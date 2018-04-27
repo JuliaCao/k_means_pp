@@ -3,7 +3,7 @@
 #SBATCH -C haswell
 #SBATCH -p debug      # change this option for non-debug runs
 #SBATCH -N 1          # you'll never need more than 1 node for the openmp code
-#SBATCH -t 00:20:00   # adjust the amount of time as necessary
+#SBATCH -t 00:05:00   # adjust the amount of time as necessary
 #SBATCH -J KMEANSOPENMP
 #SBATCH -o openmp_res.txt
 #SBATCH -e openmp_res.txt
