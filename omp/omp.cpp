@@ -9,7 +9,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#if defined __GNUC__ || defined __APPLE__
+// #if defined __GNUC__ || defined __APPLE__
 #include </global/homes/a/ardunn/eigen/Eigen/Dense>
 // #else
 // #include <eigen3/Eigen/Dense>
