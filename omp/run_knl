@@ -1,12 +1,14 @@
 #!/bin/bash
 #SBATCH -A mp309
-#SBATCH -C haswell
+#SBATCH -C knl,quad,cache
 #SBATCH -p debug      # change this option for non-debug runs
 #SBATCH -N 1          # you'll never need more than 1 node for the openmp code
 #SBATCH -t 00:30:00   # adjust the amount of time as necessary
-#SBATCH -J KMEANSserial
-#SBATCH -o openmp_res.txt
-#SBATCH -e openmp_res.txt
+#SBATCH -J KMEANSOMPKNL
+#SBATCH -o openmp_res_knl.txt
+#SBATCH -e openmp_res_knl.txt
+
+export OMP_NUM_THREADS=68
 
 for nn in 1000 10000 100000 1000000:
 do
@@ -15,7 +17,10 @@ do
       do
           for kk in 2 5 10:
           do
-						./serial -o serial.out -n $nn -m $mm -k $kk
-    			done
-			done
+							for pp in 2 4 8 16 32 48 68
+							do
+								srun -N 1 -n 1 -c 32 ./omp_knl -o omp_knl.out -n $nn -m $mm -k $kk -p $pp
+							done
+            done
+        done
 done

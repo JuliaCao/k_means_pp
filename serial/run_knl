@@ -4,7 +4,7 @@
 #SBATCH -p debug      # change this option for non-debug runs
 #SBATCH -N 1          # you'll never need more than 1 node for the openmp code
 #SBATCH -t 00:30:00   # adjust the amount of time as necessary
-#SBATCH -J KMEANSserial
+#SBATCH -J KMEANSKNLserial
 #SBATCH -o openmp_res.txt
 #SBATCH -e openmp_res.txt
 
@@ -15,7 +15,7 @@ do
       do
           for kk in 2 5 10:
           do
-						./serial -o serial.out -n $nn -m $mm -k $kk
+						./serial_knl -o serial_knl.out -n $nn -m $mm -k $kk
     			done
 			done
 done
