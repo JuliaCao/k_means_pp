@@ -2,10 +2,10 @@ CC = g++ -std=c++11
 //LDLIBS = -openmp
 target = serial
 
-all: serial serial_knl
+all: serial
 
 serial: serial.cpp
 	$(CC) serial.cpp -o serial $(LDLIBS)
-	
+
 clean:
 	rm -f $(target)
