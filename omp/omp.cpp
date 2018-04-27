@@ -191,7 +191,7 @@ int main( int argc, char** argv ){
     double CTime = kpp_openmp(X, C, weight_rand);
 
     if(fsave) {
-        fprintf( fsave, "N=%d M=%d K=%d Time=%.2f #threads=%d\n",
+        fprintf( fsave, "N=%d M=%d K=%d Time=%.8f #threads=%d\n",
         	N, M, K, CTime, P);
         fclose( fsave );
     }
