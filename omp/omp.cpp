@@ -168,7 +168,7 @@ int main( int argc, char** argv ){
     M = read_int( argc, argv, "-m", 2 );
     int P = read_int( argc, argv, "-p", 1 );
 
-		omp_set_num_threads(p);
+		omp_set_num_threads(P);
 
     char *savename = read_string( argc, argv, "-o", NULL );
     FILE *fsave = savename ? fopen( savename, "a" ) : NULL;

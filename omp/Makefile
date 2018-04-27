@@ -11,4 +11,4 @@ omp: omp.o
 omp.o: omp.cpp
 	$(CC) -c $(OPENMP) $(CFLAGS) omp.cpp
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) *.o
