@@ -9,19 +9,19 @@
 #include <ctime>
 #include <upcxx/upcxx.hpp>
 
-
-#if defined __GNUC__ || defined __APPLE__
-#include <Eigen/Dense>
-#else
-#include <eigen3/Eigen/Dense>
-#endif
+// #if defined __GNUC__ || defined __APPLE__
+// #include <Eigen/Dense>
+// #else
+// #include <eigen3/Eigen/Dense>
+// #endif
+#include </global/homes/j/juliacao/eigen/Eigen/Dense>
 
 using namespace std;
 using namespace Eigen;
 
 #define M 3
-#define K 5
-#define N 100
+#define K 2
+#define N 10
 
 
 
@@ -90,12 +90,11 @@ void kpp_serial(MatrixXd& X, MatrixXd& C, Rand& r) {
 
 struct GmatrixXd
 {
-    // upcxx::global_ptr<double> S;
     upcxx::global_ptr<int64_t> I;
     upcxx::global_ptr<double> S;
     std::vector<upcxx::global_ptr<VectorXd>> X; //has length #threads
-    std::vector<upcxx::global_ptr<VectorXd>> C;
-    upcxx::global_ptr<VectorXd> local_data;
+    // std::vector<upcxx::global_ptr<VectorXd>> C;
+    upcxx::global_ptr<VectorXd> C;
 
     size_t my_Xsize;
     size_t my_Csize;
@@ -114,7 +113,15 @@ struct GmatrixXd
 
         blk = (Xsize+upcxx::rank_n()-1)/upcxx::rank_n();
 
+        upcxx::global_ptr<VectorXd> local_data;
         local_data = upcxx::new_array<VectorXd>(blk);
+
+        for (int i = 0; i < blk; i++) {
+          VectorXd tmp = VectorXd::Random(M);
+          upcxx::rput(tmp, local_data+i).wait();
+          cout << "X" << i << ": " << tmp << endl;
+        }
+
         X[upcxx::rank_me()] = local_data;
 
         for (int i = 0; i < upcxx::rank_n(); ++i)
@@ -134,12 +141,22 @@ struct GmatrixXd
     }
 
     void write_C_slot(const int64_t slot,const VectorXd& C_i){
-        upcxx::rput(C_i,C[slot]).wait();
+        upcxx::rput(C_i,C+slot).wait();
     }
 
     void write_X_to_C(const int64_t X_slot,const int64_t C_slot){
-        VectorXd selected =  upcxx::rget(X[X_slot]).wait();
+        int rank = X_slot / blk;
+        int pos = X_slot % blk;
+	VectorXd selected =  upcxx::rget(X[rank]+pos).wait();
         write_C_slot(C_slot,selected);
+    }
+
+    int64_t get_I_slot(const int64_t slot) {
+      return upcxx::rget(I+slot).wait();
+    }
+
+    void write_S_slot(const int64_t slot,const double S_i){
+        upcxx::rput(S_i,S+slot).wait();
     }
 
 };
@@ -147,8 +164,8 @@ struct GmatrixXd
 template<typename Rand>
 void kpp_upc(GmatrixXd& XX, Rand& r){
 
-
     int p = upcxx::rank_n();//#threads
+	cout << "#p: " << p << endl;
     // vector<int> I(p,0);
     double S;
     // VectorXd S(p);
@@ -159,6 +176,8 @@ void kpp_upc(GmatrixXd& XX, Rand& r){
         D(i) = numeric_limits<float>::max();
     }
 
+    cout << "got here1" << endl;
+
     // The first seed is selected uniformly at random
     int index = (int)(r() * N);
 
@@ -166,23 +185,29 @@ void kpp_upc(GmatrixXd& XX, Rand& r){
         XX.write_X_to_C(index,0);   
     }
 
-    for(int j = 1; j < K; j++){
-
+	cout << "selected C[0]" << endl;
+    for(int j = 1; j < K; j++) {
         int t = upcxx::rank_me();
-        // #pragma omp parallel for
-        // for(int t = 0; t < p; t++){
         int lo = t * (N / p);
         int hi = min(lo + N/p, N-1);
 
         //calculate weights for this part
 
-
         S = 0.0f;
 
         // for(auto i = lo;i<hi; i++){
         for(int i = 0; i < hi - lo ; i++){
-            VectorXd C_row = upcxx::rget(XX.C[j-1]).wait();
-            VectorXd X_row = upcxx::rget(XX.X[i+lo]).wait();
+            cout << "in loop" << endl;
+            VectorXd C_row = upcxx::rget(XX.C+j-1).wait();
+	    cout << "C_row" << C_row << endl;
+	    int rank = (i+lo) / XX.blk;
+ 	    int pos = (i + lo) % XX.blk;
+	    cout << "rank " << rank << "pos " << pos << endl;
+		cout << XX.X[rank] << endl;
+		cout << XX.X[rank]+pos << endl;
+            VectorXd X_row = upcxx::rget(XX.X[rank]+pos).wait();
+	    cout << "X_row:"<< endl;
+	    cout << X_row << endl;
 
             if(j == 1){
                 D(i) = (C_row - X_row).norm();
@@ -193,23 +218,31 @@ void kpp_upc(GmatrixXd& XX, Rand& r){
             S = S + D(i);
         }
 
-        // int sub_i = weighted_rand_index_bound(D,r,lo,hi);
-        int sub_i = weighted_rand_index(D,r);
+	cout << "end of loop" << endl;
 
-
+        int64_t sub_i = weighted_rand_index_bound(D,r,lo,hi);
+        // int sub_i = weighted_rand_index(D,r);
        
         // I[t] = sub_i;
-        upcxx::rput(sub_i,XX.I[t]).wait();
-        upcxx::rput(S,XX.S[upcxx::rank_me()]).wait();
-
+        upcxx::rput(sub_i,XX.I+t).wait();
+        // upcxx::rput(S,XX.S[upcxx::rank_me()]).wait();
+        XX.write_S_slot(upcxx::rank_me(), S);
   
         upcxx::barrier();
 
+	cout << "written to slot" << endl;
+
         if(upcxx::rank_me() == 0){
           // change S
+          VectorXd S(upcxx::rank_n());
+          for (int i = 0; i < upcxx::rank_n(); ++i)
+          {
+              double tmp = upcxx::rget(XX.S+i).wait();
+              S(i) = tmp;
+          }
           int sub_t = weighted_rand_index(S,r);
           // int i = I[sub_t];
-          int i = upcxx::rget(XX.I[sub_t]);
+          int i = XX.get_I_slot(sub_t);
       
           XX.write_X_to_C(i,j);
         }
@@ -240,12 +273,13 @@ int main( int argc, char** argv ){
 
 
     MatrixXd C(K,M);
-    cout << "X" << X << endl;   
 
     // generate_data(X,mat_rand);
     upcxx::init();
     GmatrixXd XX(N,K);
+
     kpp_upc(XX, weight_rand);
+
     upcxx::finalize();
 
     // output_kmeans_pp()
