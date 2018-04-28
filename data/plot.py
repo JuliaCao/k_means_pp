@@ -78,13 +78,29 @@ def compare_kmeans(nruns=1000):
         print("Average {} n_iters needed: {}".format(initnames[i], np.mean(iters)))
 
 
-if __name__ == "__main__":
-    X = generate_data()
-    print("X is: \n", X)
-    C = kpp_serial(X, K)
+def omp_hsw_plots():
+	df = pd.read_csv('omp_hsw.csv')
+	# print(df)
 
-    print("C is \n", C)
-    print(C)
+	n1000k = df[df['n'] == 1e6]
+
+	best = n1000k[(df['m'] == 10) & (df['k'] == 5)]
+	print(best)
+	plt.scatter(best['p'], best['t'], color='red')
+	plt.plot(best['p'], best['t'], color='red')
+	plt.yscale('log')
+	plt.xscale('log')
+	plt.show()
+
+
+if __name__ == "__main__":
+    # X = generate_data()
+    # print("X is: \n", X)
+    # C = kpp_serial(X, K)
+	#
+    # print("C is \n", C)
+    # print(C)
     # compare_kmeans()
     # plot_kmeans_pp()
     # plot_kmeans()
+	omp_hsw_plots()
