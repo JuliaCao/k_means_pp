@@ -101,15 +101,18 @@ def omp_strong(comp, n, m, k, alt_title=None):
 	compname = "Knight's Landing" if comp=="knl" else "Haswell"
 	if alt_title:
 		plt.title(alt_title)
+		# plt.xscale('log')
 	else:
 		plt.title("OpenMP strong scaling on {} with N={}".format(compname, int(n)))
 	plt.xlabel("Num Threads")
 	plt.ylabel("Wall time(s)")
-	plt.yscale('log')
-	plt.xscale('log')
-	plt.legend(loc='lower right')
-	# plt.show()
-	plt.savefig('strongtrends_{}.png'.format(comp))
+	# plt.yscale('log')
+	plt.legend(loc='upper right')
+	if alt_title:
+		plt.savefig('strongtrends_{}.png'.format(comp))
+	else:
+		plt.savefig('omp_strong_{}_idv.png'.format(comp))
+	plt.show()
 
 
 def omp_weak(m, p=32):
@@ -130,9 +133,9 @@ def omp_weak(m, p=32):
 			print(d)
 			print(serial)
 			speedup = serial.as_matrix()[:len(d['t'])]/(d['t'].as_matrix())
-			# print(speedup)
+			print(len(speedup))
 			lab = "Knight's Landing" if comp == 'knl' else "Haswell".format()
-			plt.plot(n[:len(d['t'])], speedup, color=c, label=lab + ' k={}'.format(k))
+			plt.plot(n[:len(speedup)], speedup, color=c, label=lab + ' k={}'.format(k))
 			plt.scatter(n[:len(d['t'])], speedup, color=c)
 
 	plt.title("Speedup vs. N, M={} for KNL (68 core) and Haswell (32 core)".format(m))
@@ -141,7 +144,7 @@ def omp_weak(m, p=32):
 	plt.xlabel("Number of Points (N)")
 	plt.ylabel("Speedup (Compared to Serial)")
 	# plt.show()
-	plt.savefig('speedup.png')
+	plt.savefig(f'weak_omp_{m}.png')
 
 
 def upc_strong(n, m, k):
@@ -158,28 +161,51 @@ def upc_strong(n, m, k):
 	plt.legend()
 	plt.title("UPC Strong Scaling on Haswell with N={}".format(int(n)))
 	plt.ylabel("Wall time(s)")
-	plt.xlabel("Num threads")
-	# plt.show()
-	plt.savefig('upc{}_6.png'.format(int(n)))
+	plt.xlabel("Num Ranks")
+	plt.savefig(f'upc_strong_hsw.png')
+	plt.show()
+
+def upc_batch_strong(n, m, k, machine):
+	df = pd.read_csv(f'upc_{machine}_batch.csv')
+	df = df[df['n'] == n]
+
+	for i, mi in enumerate(m):
+		for j, kj in enumerate(k):
+			d = df[(df['m'] == mi) & (df['k'] == kj)  & (df['p']!=1)]
+			c = rancolor()
+			# print(d['p'])
+			print(d)
+			plt.scatter(d['p'], d['t'], color=c, label=None)
+			plt.plot(d['p'], d['t'], color=c, label='m = {}, k = {}'.format(mi, kj))
+	plt.legend()
+	n = int(n)
+	platform = 'Haswell' if machine == 'hsw' else "Knight's Landing"
+	plt.title(f"UPC Strong Scaling on {platform} with N={n}")
+	plt.ylabel("Wall time(s)")
+	# plt.yscale('log')
+	# plt.ylim(min(d['t']), max(d['t']))
+	plt.xlabel("Num Ranks")
+	plt.savefig(f'upc_batch_strong_{machine}.png')
+	plt.show()
 
 
 def upc_weak(m, p=128):
-	basecolor = 'green'
-	colors = ['', 'dark', 'light']
-	for i, k in enumerate([2, 5, 10]):
-		df = pd.read_csv('upc_hsw.csv')
+	# basecolor = 'green'
+	# colors = ['', 'dark', 'light']
+	# for i, k in enumerate([2, 5, 10]):
+	# 	df = pd.read_csv('upc_hsw.csv')
 
-		df = df[(df['m'] == m) & (df['k'] == k)]
-		n = [1e3, 1e4, 1e5, 1e6]
-		# print(df)
+	# 	df = df[(df['m'] == m) & (df['k'] == k)]
+	# 	n = [1e3, 1e4, 1e5, 1e6]
+	# 	# print(df)
 
-		c = colors[i] + basecolor
-		print(df[df['p'] == 1])
-		print(df[df['p'] == 128])
-		# speedup = df[df['p'] == 128]['t'].as_matrix()/df[df['p'] == 1].as_matrix()
+	# 	c = colors[i] + basecolor
+	# 	print(df[df['p'] == 1])
+	# 	print(df[df['p'] == 128])
+	# 	speedup = df[df['p'] == 128]['t'].as_matrix()/df[df['p'] == 1].as_matrix()
 	# 	plt.plot(n[:len(d['t'])], speedup, color=c, label=lab + ' k={}'.format(k))
 	# 	plt.scatter(n[:len(d['t'])], speedup, color=c)
-	#
+	
 	# plt.title("Speedup vs. N, M={} for KNL (68 core) and Haswell (32 core)".format(m))
 	# plt.legend(loc='lower right')
 	# plt.xscale('log')
@@ -187,6 +213,76 @@ def upc_weak(m, p=128):
 	# plt.ylabel("Speedup (Compared to Serial)")
 	# # plt.show()
 	# plt.savefig('speedup.png')
+	for comp in ['hsw', 'knl']:
+		basecolor = 'green' if comp=='hsw' else 'blue'
+		colors = ['', 'dark', 'light']
+		for i, k in enumerate([2, 5, 10]):
+			df = pd.read_csv('upc_{}_1000.csv'.format(comp))
+
+			df = df[(df['m'] == m) & (df['k'] == k)]
+			serial = df[df['p'] == 1]['t']
+			n = [1e3, 1e4, 1e5, 1e6]
+			# print(df)
+
+			c = colors[i] + basecolor
+			print(c)
+			d = df[df['p'] == p]
+			print(d)
+			print(serial)
+			speedup = serial.as_matrix()[:len(d['t'])]/(d['t'].as_matrix())
+			print('speedup', speedup)
+			# print(speedup)
+			lab = "Knight's Landing" if comp == 'knl' else "Haswell".format()
+			plt.plot(n[:len(d['t'])], speedup, color=c, label=lab + ' k={}'.format(k))
+			plt.scatter(n[:len(d['t'])], speedup, color=c)
+
+	plt.title(f"Speedup vs. N, M={m} for {p} proc on KNL(68 cores) and Haswell(32 cores)")
+	plt.legend(loc='lower right')
+	plt.xscale('log')
+	plt.xlabel("Number of Points (N)")
+	plt.ylabel("Speedup (Compared to Serial)")
+	# plt.show()
+	plt.savefig('upc_weak.png')
+
+def upc_weak_batch(m, p=128):
+	for comp in ['hsw', 'knl']:
+		basecolor = 'green' if comp=='hsw' else 'blue'
+		colors = ['', 'dark', 'light']
+		for i, k in enumerate([2, 5, 10]):
+			df = pd.read_csv('upc_{}_batch.csv'.format(comp))
+
+			df = df[(df['m'] == m) & (df['k'] == k)]
+			serial = df[df['p'] == 2]['t']*1.5
+			n = [1e3, 1e4, 1e5, 1e6]
+			# print(df)
+
+			c = colors[i] + basecolor
+			print(c)
+			d = df[df['p'] == p][:len(n)]
+			serial = list(serial.as_matrix())
+			if len(d) > len(serial):
+
+				temp = df[df['p'] == 8]['t']*4
+				temp = list(temp.as_matrix())
+				print('temp', temp)
+				temp = temp[-1]
+				serial.append(temp)
+			speedup = serial[:len(d['t'])]/(d['t'].as_matrix())
+			print(d)
+			print(serial)
+			print('speedup', speedup)
+			# print(speedup)
+			lab = "Knight's Landing" if comp == 'knl' else "Haswell".format()
+			plt.plot(n[:len(d['t'])], speedup, color=c, label=lab + ' k={}'.format(k))
+			plt.scatter(n[:len(d['t'])], speedup, color=c)
+
+	plt.title(f"Speedup vs. N, M={m} for {p} Processes on KNL(68 cores) and Haswell(32 cores)", fontsize=11)
+	plt.legend(loc='upper left')
+	plt.xscale('log')
+	plt.xlabel("Number of Points (N)")
+	plt.ylabel("Speedup (Compared to Serial)")
+	plt.savefig('upc_weak_batch.png')
+	plt.show()
 
 
 if __name__ == "__main__":
@@ -200,7 +296,11 @@ if __name__ == "__main__":
 	# plot_kmeans_pp(s=13)
 	# plot_kmeans()
 	# plot_kmeans(s=13)
-	# omp_strong(comp='hsw', n=1e5, m=[5000, 1000, 10, 1], k=[5], alt_title="Effect of Dimensionality")
-	# omp_weak(m=5000, p=16)
-	# upc_strong(1e4, [5000], [5, 10])
-	upc_weak(m=1000, p=64)
+	# omp_strong(comp='hsw', n=1e5, m=[5000, 1000], k=[2,5,10], alt_title="Effect of Dimensionality on Haswell")
+	# omp_strong(comp='knl', n=1e5, m=[1000], k=[2,5,10])
+	# omp_weak(m=5000, p=32)
+	# upc_strong(1e4, m=[1000], k=[2, 5, 10])
+	# upc_batch_strong(1e4, m=[1000], k=[2,5,10], machine='hsw')
+	# upc_weak(m=1000, p=128)
+	upc_weak_batch(m=1000, p=32)
+
