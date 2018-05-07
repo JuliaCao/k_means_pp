@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH -A mp309
+#SBATCH -C knl,quad,cache
+#SBATCH -p debug      # change this option for non-debug runs
+#SBATCH -N 1          # you'll never need more than 1 node for the openmp code
+#SBATCH -t 00:30:00   # adjust the amount of time as necessary
+#SBATCH -J UPCKNL
+#SBATCH -o upc_knl_new.stdout
+#SBATCH -e upc_knl_new.error
+
+export GASNET_MAX_SEGSIZE=2048GB
+export UPCXX_SEGMENT_MB=2048GB
+
+for nn in 1000000:
+do
+    for mm in 1000:
+        do
+            for kk in 10:
+                do
+                    for n in 4 8 16 32 64 128
+                        do
+                        srun -N 1 -n $n ./upc -o upc_knl_last_new.out -n $nn -m $mm -k $kk
+                        done
+                done
+        done
+  done

@@ -1,0 +1,24 @@
+srun: error: nid02516: tasks 0-3: Killed
+srun: Terminating job step 12168932.0
+srun: Force Terminated job step 12168932.0
+srun: error: nid02516: tasks 2-3,5-7: Killed
+srun: Terminating job step 12168932.1
+srun: error: nid02516: tasks 0-1,4: Killed
+srun: Force Terminated job step 12168932.1
+srun: error: nid02516: tasks 0-15: Killed
+srun: Terminating job step 12168932.2
+srun: Force Terminated job step 12168932.2
+srun: error: nid02516: task 16: Killed
+srun: Terminating job step 12168932.3
+slurmstepd: error: *** STEP 12168932.3 ON nid02516 CANCELLED AT 2018-05-06T14:34:16 ***
+srun: error: nid02516: tasks 2-3,11,24,26,31: Killed
+srun: error: nid02516: tasks 0-1,4-10,12-15,17-23,25,27-30: Killed
+srun: Force Terminated job step 12168932.3
+WARNING: Requested UPCXX segment size (2147483648) is larger than the GASNet segment size (1256194048). Adjusted segment size to 1256194048.
+srun: error: nid02516: tasks 0-63: Killed
+srun: Terminating job step 12168932.4
+srun: Force Terminated job step 12168932.4
+WARNING: Requested UPCXX segment size (2147483648) is larger than the GASNet segment size (622854144). Adjusted segment size to 622854144.
+srun: error: nid02516: tasks 0-127: Killed
+srun: Terminating job step 12168932.5
+srun: Force Terminated job step 12168932.5

@@ -8,11 +8,15 @@ CXX = CC
 CXXFLAGS = `upcxx-meta PPFLAGS` `upcxx-meta LDFLAGS`
 LDFLAGS = `upcxx-meta LIBFLAGS`
 
-all: upc
+all: upc upc_old
 
 upc: upc.cpp
 	$(CXX) upc.cpp -o upc $(CXXFLAGS) $(LDFLAGS)
 
+upc_old: upc_old.cpp
+	$(CXX) upc_old.cpp -o upc_old $(CXXFLAGS) $(LDFLAGS)
+
+
 clean:
-	@rm -fv upc
+	@rm -fv all
 

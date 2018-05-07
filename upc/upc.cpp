@@ -21,7 +21,7 @@ using namespace std;
 using namespace Eigen;
 
 int N;
-int M;
+size_t M;
 int K;
 
 int find_option( int argc, char **argv, const char *option )
@@ -129,22 +129,16 @@ struct GmatrixXd
         for (int i = 0; i < blk; i++) {
           v1 = VectorXd::Random(M);
           vector<double> v2(v1.data(), v1.data() + v1.size());
+          double *v3 = &v2[0];
 
           // cout << "X" << i << endl;
-          for (int j = 0; j < M; j++) {
+          // for (int j = 0; j < M; j++) {
             // cout << v2[j] << " " ;
-            upcxx::rput(v2[j], local_data+i*M+j).wait();
-          }
+            // upcxx::rput(v2[j], local_data+i*M+j).wait();
+          // }
           // cout << " " << endl;
+          upcxx::rput(v3, local_data+i*M, M).wait();
         }
-
-        // for (int i = 0; i < blk_size; i++) {
-        //   double tmp = upcxx::rget(local_data+i).wait();
-        //   cout << tmp << endl;
-        //   if (i % 3 == 2) {
-        //     cout << " " << endl;
-        //   }
-        // }
 
         X[upcxx::rank_me()] = local_data;
 
@@ -164,28 +158,29 @@ struct GmatrixXd
 
     }
 
-    void write_C_slot(const int64_t slot, const vector<double>& v2) {
+    void write_C_slot(const int64_t slot, const double *v2) {
       static int x=0;
       // cout << "write_C_slot " << x << endl;
-      for (int i = 0; i < M; i++) {
+      // for (int i = 0; i < M; i++) {
         // cout << v2[i] << endl;
-        upcxx::rput(v2[i],C+slot*M+i).wait();
+        // upcxx::rput(v2[i],C+slot*M+i).wait();
         // cout << "write index" << slot*M+i << endl;
-      }
+      // }
       // cout << "written " << x++ << endl;
+      upcxx::rput(v2,C+slot*M, M).wait();
     }
 
     void write_X_to_C(const int64_t X_slot,const int64_t C_slot){
         int rank = X_slot / blk;
         int pos = X_slot % blk;
 
-        vector<double> vec_holder;
-        vec_holder.resize(M);
+        double *vec_holder = new double[M];        
 
-        for (int i = 0; i < M; i++) {
-          double tmp = upcxx::rget(X[rank]+pos*M+i).wait();
-          vec_holder[i] = tmp;
-        }
+        upcxx::rget(X[rank]+pos*M, vec_holder, M);
+        // for (int i = 0; i < M; i++) {
+        //   double tmp = upcxx::rget(X[rank]+pos*M+i).wait();
+        //   vec_holder[i] = tmp;
+        // }
 
         write_C_slot(C_slot,vec_holder);
     }
@@ -206,30 +201,36 @@ struct GmatrixXd
   // }
 
     VectorXd get_C_row(const int64_t slot) {
-      vector<double> vec_holder;
-      vec_holder.resize(M);
-
-      for (int i = 0; i < M; i++) {
+      // vector<double> vec_holder;
+      // vec_holder.resize(M);
+      // for (int i = 0; i < M; i++) {
         // cout << "read index" << slot*M+i << endl;
-        double tmp = upcxx::rget(C+slot*M+i).wait();
-        vec_holder[i] = tmp;
+        // double tmp = upcxx::rget(C+slot*M+i).wait();
+        // vec_holder[i] = tmp;
         // cout << tmp << endl;
-      }
+      // }
+      double *vec_holder = new double[M];        
+      upcxx::rget(C+slot*M, vec_holder, M);
 
-      VectorXd v2 = Map<VectorXd, Unaligned>(vec_holder.data(), vec_holder.size());
+      // VectorXd v2 = Map<VectorXd, Unaligned>(vec_holder.data(), vec_holder.size());
+      VectorXd v2 = Map<VectorXd>(vec_holder, M);
+      // cout << "get C row " << slot << endl;
+      // cout << v2 << endl;
       return v2;
     }
 
     VectorXd get_X_row(const int64_t rank, const int64_t pos) {
-        vector<double> vec_holder;
-        vec_holder.resize(M);
-
-        for (int i = 0; i < M; i++) {
-          double tmp = upcxx::rget(X[rank]+pos*M+i).wait();
-          vec_holder[i] = tmp;
-        }
-
-        VectorXd v2 = Map<VectorXd, Unaligned>(vec_holder.data(), vec_holder.size());
+        // vector<double> vec_holder;
+        // vec_holder.resize(M);
+        // for (int i = 0; i < M; i++) {
+        //   double tmp = upcxx::rget(X[rank]+pos*M+i).wait();
+        //   vec_holder[i] = tmp;
+        // }
+        // VectorXd v2 = Map<VectorXd, Unaligned>(vec_holder.data(), vec_holder.size());
+        double *vec_holder = new double[M];        
+        upcxx::rget(X[rank]+pos*M, vec_holder, M);
+        VectorXd v2 = Map<VectorXd>(vec_holder, M);
+        
         return v2;
     }
 };
@@ -239,7 +240,7 @@ double kpp_upc(GmatrixXd& XX, Rand& r){
     double STime = read_timer( );
 
     int p = upcxx::rank_n();//#threads
-	   cout << "#p: " << p << endl;
+       cout << "#p: " << p << endl;
     // vector<int> I(p,0);
     double S;
     // VectorXd S(p);
@@ -272,8 +273,8 @@ double kpp_upc(GmatrixXd& XX, Rand& r){
         for(int i = 0; i < XX.blk ; i++) {
             VectorXd C_row = XX.get_C_row(j-1);
 
-      	    // int rank = i / XX.blk;
-       	    // int pos = i % XX.blk;
+            // int rank = i / XX.blk;
+            // int pos = i % XX.blk;
  
             VectorXd X_row = XX.get_X_row(t, i);
 
@@ -304,11 +305,15 @@ double kpp_upc(GmatrixXd& XX, Rand& r){
         if(upcxx::rank_me() == 0) {
           // change S
           VectorXd S(upcxx::rank_n());
-          for (int i = 0; i < upcxx::rank_n(); ++i)
-          {
-              double tmp = upcxx::rget(XX.S+i).wait();
-              S(i) = tmp;
-          }
+          // for (int i = 0; i < upcxx::rank_n(); ++i)
+          // {
+          //     double tmp = upcxx::rget(XX.S+i).wait();
+          //     S(i) = tmp;
+          // }
+          double *vec_holder = new double[upcxx::rank_n()];
+          upcxx::rget(XX.S, vec_holder, upcxx::rank_n()).wait();
+          S = Map<VectorXd>(vec_holder, upcxx::rank_n());
+
           int sub_t = weighted_rand_index(S,r);
           // int i = I[sub_t];
           int i = XX.get_I_slot(sub_t);
@@ -324,13 +329,15 @@ double kpp_upc(GmatrixXd& XX, Rand& r){
     }
 
     double CTime = read_timer( ) - STime;
-    return CTime;
 
     // cout << "final C" << endl;
     // for (int i = 0; i < K; i++) {
+    //   cout << "C" << i << endl;
     //   VectorXd C_row = XX.get_C_row(i);
     //   cout << C_row << endl;
     // }
+    // cout << CTime << endl;
+    return CTime;
 }
 
 
@@ -339,7 +346,7 @@ int main( int argc, char** argv ){
 
     N = read_int( argc, argv, "-n", 100 );
     K = read_int( argc, argv, "-k", 3 );
-    M = read_int( argc, argv, "-m", 2 );
+    M = (size_t)read_int( argc, argv, "-m", 2 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
     FILE *fsave = savename ? fopen( savename, "a" ) : NULL;
@@ -352,9 +359,9 @@ int main( int argc, char** argv ){
     auto weight_rand = bind(zero_one,ref(rd));
 
     upcxx::init();
+    double STime = read_timer();
     GmatrixXd XX(N,K);
-
-    kpp_upc(XX, weight_rand);
+    STime = read_timer() - STime;
 
     double CTime = kpp_upc(XX, weight_rand);
 
@@ -362,7 +369,7 @@ int main( int argc, char** argv ){
 
     if (upcxx::rank_me() == 0) {
       if(fsave) {
-          fprintf( fsave, "N=%d M=%d K=%d Rank=%d Time=%.2f\n", N, M, K, p, CTime);
+          fprintf( fsave, "N=%d M=%d K=%d Rank=%d CompTime=%.9f SetupTime=%.9f\n", N, M, K, p, CTime, STime);
           fclose( fsave );
       }
     }

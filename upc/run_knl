@@ -5,19 +5,23 @@
 #SBATCH -N 1          # you'll never need more than 1 node for the openmp code
 #SBATCH -t 00:30:00   # adjust the amount of time as necessary
 #SBATCH -J KMEANSOMPKNL
-#SBATCH -o auto_upc_knl.stdout
-#SBATCH -e auto_upc_knl.error
+#SBATCH -o upc_knl.stdout
+#SBATCH -e upc_knl.error
 
-for nn in 1000 10000 100000 1000000:
+export GASNET_MAX_SEGSIZE=2048GB
+export UPCXX_SEGMENT_MB=2048GB
+
+for nn in 1000000:
 do
-    for mm in 1000 5000:
+    for mm in 1000:
         do
-            for kk in 2 5 10:
+            for kk in 5:
                 do
-                    for n in 1 2 4 6 8 16 32 64
+                    for n in 64 128
                         do
-                        srun -N 1 -n $n ./upc -o upc.out -n $nn -m $mm -k $kk
+                        srun -N 1 -n $n ./upc -o upc_knl_last.out -n $nn -m $mm -k $kk
                         done
                 done
         done
   done
+
