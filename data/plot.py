@@ -138,7 +138,7 @@ def omp_weak(m, p=32):
 			plt.plot(n[:len(speedup)], speedup, color=c, label=lab + ' k={}'.format(k))
 			plt.scatter(n[:len(d['t'])], speedup, color=c)
 
-	plt.title("Speedup vs. N, M={} for KNL (68 core) and Haswell (32 core)".format(m))
+	plt.title(f"Speedup vs. N, M={m} with {p} threads for KNL and Haswell", fontsize=11)
 	plt.legend(loc='lower right')
 	plt.xscale('log')
 	plt.xlabel("Number of Points (N)")
@@ -236,7 +236,7 @@ def upc_weak(m, p=128):
 			plt.plot(n[:len(d['t'])], speedup, color=c, label=lab + ' k={}'.format(k))
 			plt.scatter(n[:len(d['t'])], speedup, color=c)
 
-	plt.title(f"Speedup vs. N, M={m} for {p} proc on KNL(68 cores) and Haswell(32 cores)")
+	plt.title(f"Speedup vs. N, M={m} for {p} proc on KNL and Haswell", fontsize=11)
 	plt.legend(loc='lower right')
 	plt.xscale('log')
 	plt.xlabel("Number of Points (N)")
@@ -276,8 +276,8 @@ def upc_weak_batch(m, p=128):
 			plt.plot(n[:len(d['t'])], speedup, color=c, label=lab + ' k={}'.format(k))
 			plt.scatter(n[:len(d['t'])], speedup, color=c)
 
-	plt.title(f"Speedup vs. N, M={m} for {p} Processes on KNL(68 cores) and Haswell(32 cores)", fontsize=11)
-	plt.legend(loc='upper left')
+	plt.title(f"Speedup vs. N, M={m} for {p} Processes on KNL and Haswell", fontsize=11)
+	plt.legend(loc='lower right')
 	plt.xscale('log')
 	plt.xlabel("Number of Points (N)")
 	plt.ylabel("Speedup (Compared to Serial)")
@@ -298,7 +298,7 @@ if __name__ == "__main__":
 	# plot_kmeans(s=13)
 	# omp_strong(comp='hsw', n=1e5, m=[5000, 1000], k=[2,5,10], alt_title="Effect of Dimensionality on Haswell")
 	# omp_strong(comp='knl', n=1e5, m=[1000], k=[2,5,10])
-	# omp_weak(m=5000, p=32)
+	# omp_weak(m=1000, p=32) 
 	# upc_strong(1e4, m=[1000], k=[2, 5, 10])
 	# upc_batch_strong(1e4, m=[1000], k=[2,5,10], machine='hsw')
 	# upc_weak(m=1000, p=128)
